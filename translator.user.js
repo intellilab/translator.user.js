@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name translator
 // @namespace https://lufei.so
+// @supportURL https://github.com/intellilab/translator.user.js
 // @description 划词翻译
-// @version 1.5.1
+// @version 1.5.5
 // @run-at document-start
 // @grant GM_addStyle
 // @grant GM_xmlhttpRequest
@@ -127,14 +128,16 @@ GM_addStyle(
     'border-bottom: 1px dashed #aaa',
   ].join(';') + '}' +
   '.' + randKey + '-header>[data-type]{' + [
-    'margin-left: .5em',
+    'margin-left: 8px',
     'color: #7cbef0',
     'cursor: pointer',
+    'font-size: 13px'
   ].join(';') + '}' +
   '.' + randKey + '-detail{' + [
     'margin: 8px 0 0',
     'line-height: 22px',
     'list-style: none',
+    'font-size: 13px'
   ].join(';') + '}'
 )
 panel = document.createElement('div')
