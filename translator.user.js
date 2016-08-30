@@ -59,6 +59,38 @@ function render(o) {
     panelBody.appendChild(translation)
   }
 }
+function translate(e) {
+  var sel = window.getSelection()
+  var text = sel.toString()
+  if (/^\s*$/.test(text)) return
+  if (!document.activeElement.contains(window.getSelection().getRangeAt(0).startContainer)) return
+  GM_xmlhttpRequest({
+    method: 'GET',
+    url: 'https://fanyi.youdao.com/openapi.do?relatedUrl=http%3A%2F%2Ffanyi.youdao.com%2Fopenapi%3Fpath%3Dweb-mode&keyfrom=test&key=null&type=data&doctype=json&version=1.1&q=' + window.encodeURIComponent(text),
+    onload: function (res) {
+      var data = JSON.parse(res.responseText)
+      var w = window.innerWidth, h = window.innerHeight
+      if (!data.errorCode) {
+        render(data)
+        if (e.clientY > h * .5) {
+          panel.style.top = 'auto'
+          panel.style.bottom = h - e.clientY + 10 + 'px'
+        } else {
+          panel.style.top = e.clientY + 10 + 'px'
+          panel.style.bottom = 'auto'
+        }
+        if (e.clientX > w * .5) {
+          panel.style.left = 'auto'
+          panel.style.right = w - e.clientX + 'px'
+        } else {
+          panel.style.left = e.clientX + 'px'
+          panel.style.right = 'auto'
+        }
+        document.body.appendChild(panel)
+      }
+    }
+  })
+}
 
 var panel, panelBody, panelPos, audio
 
@@ -115,37 +147,8 @@ document.addEventListener('mousedown', function (e) {
   if (panel.contains(e.target)) return
   panel.parentNode && panel.parentNode.removeChild(panel)
   panelBody.innerHTML = ''
-}, true);
+}, true)
 document.addEventListener('mouseup', function (e) {
-  var text, sel
   if (panel.contains(e.target)) return
-  sel = window.getSelection()
-  text = sel.toString()
-  if (/^\s*$/.test(text)) return
-  GM_xmlhttpRequest({
-    method: 'GET',
-    url: 'https://fanyi.youdao.com/openapi.do?relatedUrl=http%3A%2F%2Ffanyi.youdao.com%2Fopenapi%3Fpath%3Dweb-mode&keyfrom=test&key=null&type=data&doctype=json&version=1.1&q=' + window.encodeURIComponent(text),
-    onload: function (res) {
-      var data = JSON.parse(res.responseText)
-      var w = window.innerWidth, h = window.innerHeight
-      if (!data.errorCode) {
-        render(data)
-        if (e.clientY > h * .5) {
-          panel.style.top = 'auto'
-          panel.style.bottom = h - e.clientY + 10 + 'px'
-        } else {
-          panel.style.top = e.clientY + 10 + 'px'
-          panel.style.bottom = 'auto'
-        }
-        if (e.clientX > w * .5) {
-          panel.style.left = 'auto'
-          panel.style.right = w - e.clientX + 'px'
-        } else {
-          panel.style.left = e.clientX + 'px'
-          panel.style.right = 'auto'
-        }
-        document.body.appendChild(panel)
-      }
-    }
-  })
+  setTimeout(translate, 0, e)
 }, true)
