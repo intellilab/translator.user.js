@@ -63,7 +63,7 @@ function translate(e) {
   var sel = window.getSelection()
   var text = sel.toString()
   if (/^\s*$/.test(text)) return
-  if (!document.activeElement.contains(window.getSelection().getRangeAt(0).startContainer)) return
+  if (['input', 'textarea'].indexOf(document.activeElement.tagName.toLowerCase()) < 0 && !document.activeElement.contains(window.getSelection().getRangeAt(0).startContainer)) return
   GM_xmlhttpRequest({
     method: 'GET',
     url: 'https://fanyi.youdao.com/openapi.do?relatedUrl=http%3A%2F%2Ffanyi.youdao.com%2Fopenapi%3Fpath%3Dweb-mode&keyfrom=test&key=null&type=data&doctype=json&version=1.1&q=' + window.encodeURIComponent(text),
