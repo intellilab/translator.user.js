@@ -10,7 +10,7 @@
 // ==/UserScript==
 
 function play(query, type) {
-  audio.src = 'http://dict.youdao.com/dictvoice?audio=' + window.encodeURIComponent(query) + '&type=' + type
+  audio.src = 'https://dict.youdao.com/dictvoice?audio=' + window.encodeURIComponent(query) + '&type=' + type
 }
 function htmlEntities(s) {
   var o = {
