@@ -138,6 +138,10 @@ GM_addStyle(
     'line-height: 22px',
     'list-style: none',
     'font-size: 13px'
+  ].join(';') + '}' + 
+  '.' + randKey + '-detail>li{' + [
+    'font-size: 13px',
+    'line-height: 26px'
   ].join(';') + '}'
 )
 panel = document.createElement('div')
