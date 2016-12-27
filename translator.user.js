@@ -10,7 +10,7 @@
 // ==/UserScript==
 
 function play(query, type) {
-  audio.src = 'https://dict.youdao.com/dictvoice?audio=' + window.encodeURIComponent(query) + '&type=' + type
+  audio.src = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(query) + '&type=' + type
 }
 function htmlEntities(s) {
   var o = {
@@ -67,7 +67,7 @@ function translate(e) {
   if (['input', 'textarea'].indexOf(document.activeElement.tagName.toLowerCase()) < 0 && !document.activeElement.contains(window.getSelection().getRangeAt(0).startContainer)) return
   GM_xmlhttpRequest({
     method: 'GET',
-    url: 'https://fanyi.youdao.com/openapi.do?relatedUrl=http%3A%2F%2Ffanyi.youdao.com%2Fopenapi%3Fpath%3Dweb-mode&keyfrom=test&key=null&type=data&doctype=json&version=1.1&q=' + window.encodeURIComponent(text),
+    url: 'https://fanyi.youdao.com/openapi.do?relatedUrl=http%3A%2F%2Ffanyi.youdao.com%2Fopenapi%3Fpath%3Dweb-mode&keyfrom=test&key=null&type=data&doctype=json&version=1.1&q=' + encodeURIComponent(text),
     onload: function (res) {
       var data = JSON.parse(res.responseText)
       var w = window.innerWidth, h = window.innerHeight
