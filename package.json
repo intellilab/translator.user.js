@@ -1,6 +1,6 @@
 {
   "name": "translator.user.js",
-  "version": "1.0.0",
+  "version": "1.5.5",
   "description": "Translate anything!",
   "scripts": {
     "build": "rollup -c rollup.config.js",
@@ -24,6 +24,7 @@
     "eslint-config-airbnb-base": "^11.1.3",
     "eslint-plugin-import": "^2.2.0",
     "rollup": "^0.41.6",
-    "rollup-plugin-babel": "^2.7.1"
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-replace": "^1.1.1"
   }
 }
