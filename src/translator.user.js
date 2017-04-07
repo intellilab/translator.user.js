@@ -91,6 +91,17 @@ function translate(e) {
     },
   });
 }
+function debounce(func, delay) {
+  let timer;
+  function exec(...args) {
+    timer = null;
+    func(...args);
+  }
+  return (...args) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(exec, delay, ...args);
+  };
+}
 function initialize() {
   const randKey = `it-${Math.random().toString(16).slice(2, 8)}`;
   const audio = document.createElement('audio');
@@ -100,14 +111,24 @@ function initialize() {
   const panelBody = document.createElement('div');
   panelBody.className = `${randKey} ${randKey}-body`;
   panel.appendChild(panelBody);
+  const debouncedTranslate = debounce(translate);
+  let isSelecting;
   document.addEventListener('mousedown', (e) => {
+    isSelecting = false;
     if (panel.contains(e.target)) return;
     if (panel.parentNode) panel.parentNode.removeChild(panel);
     panelBody.innerHTML = '';
   }, true);
+  document.addEventListener('mousemove', () => {
+    isSelecting = true;
+  }, true);
   document.addEventListener('mouseup', (e) => {
+    if (panel.contains(e.target) || !isSelecting) return;
+    debouncedTranslate(e);
+  }, true);
+  document.addEventListener('dblclick', (e) => {
     if (panel.contains(e.target)) return;
-    setTimeout(translate, 0, e);
+    debouncedTranslate(e);
   }, true);
 
   GM_addStyle(`\
