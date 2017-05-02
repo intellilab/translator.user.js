@@ -3,13 +3,16 @@
 // @namespace https://lufei.so
 // @supportURL https://github.com/intellilab/translator.user.js
 // @description 划词翻译
-// @version VERSION
+// @version process.env.VERSION
 // @run-at document-start
 // @grant GM_addStyle
 // @grant GM_xmlhttpRequest
 // ==/UserScript==
 
+const styles = process.env.STYLES;
+GM_addStyle(process.env.CSS);
 const translator = initialize();
+
 const entities = {
   '<': '&lt;',
   '&': '&amp;',
@@ -17,18 +20,20 @@ const entities = {
 function htmlEntities(str) {
   return str && str.replace(/[<&]/g, char => entities[char]);
 }
+
 function render(data) {
-  const { body, randKey, audio } = translator;
+  const { body, audio } = translator;
   body.innerHTML = '';
   const { basic, query, translation } = data;
   if (basic) {
     const { 'us-phonetic': us, 'uk-phonetic': uk, explains } = basic;
     const header = document.createElement('div');
-    header.className = `${randKey} ${randKey}-header`;
-    header.innerHTML = `\
-<span>${htmlEntities(query)}</span>\
-<span data-type="1">uk:[${uk}]</span>\
-<span data-type="2">us:[${us}]</span>`;
+    header.className = styles.header;
+    header.innerHTML = [
+      `<span>${htmlEntities(query)}</span>`,
+      `<span data-type="1">uk:[${uk}]</span>`,
+      `<span data-type="2">us:[${us}]</span>`,
+    ].join('');
     body.appendChild(header);
     header.addEventListener('click', (e) => {
       const { type } = e.target.dataset;
@@ -38,10 +43,9 @@ function render(data) {
     });
     if (explains) {
       const ul = document.createElement('ul');
-      ul.className = `${randKey} ${randKey}-detail`;
+      ul.className = styles.detail;
       for (let i = 0; i < explains.length; i += 1) {
         const li = document.createElement('li');
-        li.className = randKey;
         li.innerHTML = explains[i];
         ul.appendChild(li);
       }
@@ -49,11 +53,11 @@ function render(data) {
     }
   } else if (translation) {
     const div = document.createElement('div');
-    div.className = randKey;
     div.innerHTML = translation[0];
     body.appendChild(div);
   }
 }
+
 function translate(e) {
   const sel = window.getSelection();
   const text = sel.toString();
@@ -91,6 +95,7 @@ function translate(e) {
     },
   });
 }
+
 function debounce(func, delay) {
   let timer;
   function exec(...args) {
@@ -102,14 +107,14 @@ function debounce(func, delay) {
     timer = setTimeout(exec, delay, ...args);
   };
 }
+
 function initialize() {
-  const randKey = `it-${Math.random().toString(16).slice(2, 8)}`;
   const audio = document.createElement('audio');
   audio.autoplay = true;
   const panel = document.createElement('div');
-  panel.className = `${randKey} ${randKey}-panel`;
+  panel.className = styles.panel;
   const panelBody = document.createElement('div');
-  panelBody.className = `${randKey} ${randKey}-body`;
+  panelBody.className = styles.body;
   panel.appendChild(panelBody);
   const debouncedTranslate = debounce(translate);
   let isSelecting;
@@ -131,54 +136,7 @@ function initialize() {
     debouncedTranslate(e);
   }, true);
 
-  GM_addStyle(`\
-.${randKey} {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-.${randKey}-panel {
-  position: fixed;
-  max-width: 300px;
-  z-index: 10000;
-}
-.${randKey}-body {
-  position: relative;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #eaeaea;
-  line-height: 24px;
-  color: #555;
-  background-color: #fff;
-  font-family: monospace, consolas;
-  font-size: 14px;
-  text-align: left;
-  word-break: break-all;
-}
-.${randKey}-header {
-  padding: 0 0 8px;
-  border-bottom: 1px dashed #aaa;
-  color: #333;
-}
-.${randKey}-header > [data-type] {
-  margin-left: 8px;
-  color: #7cbef0;
-  cursor: pointer;
-  font-size: 13px;
-}
-.${randKey}-detail {
-  margin: 8px 0 0;
-  line-height: 22px;
-  list-style: none;
-  font-size: 13px;
-}
-.${randKey}-detail > li {
-  font-size: 13px;
-  line-height: 26px;
-}`);
-
   return {
-    randKey,
     audio,
     panel,
     body: panelBody,
