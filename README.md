@@ -13,6 +13,13 @@ $ npm i
 $ yarn
 ```
 
+开发
+---
+``` sh
+$ npm run dev
+```
+然后使用暴力猴（Violentmonkey）的*跟踪本地文件变化*功能开发。
+
 编译
 ---
 ``` sh
