@@ -1,12 +1,12 @@
-.container {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 .panel {
   position: fixed;
   max-width: 300px;
   z-index: 10000;
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 }
 .body {
   position: relative;
