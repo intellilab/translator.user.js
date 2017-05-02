@@ -27,12 +27,13 @@ function render(data) {
   const { basic, query, translation } = data;
   if (basic) {
     const { 'us-phonetic': us, 'uk-phonetic': uk, explains } = basic;
+    const nosm = '&hearts;';
     const header = document.createElement('div');
     header.className = styles.header;
     header.innerHTML = [
       `<span>${htmlEntities(query)}</span>`,
-      `<span data-type="1">uk:[${uk}]</span>`,
-      `<span data-type="2">us:[${us}]</span>`,
+      `<span data-type="1">uk:[${uk || nosm}]</span>`,
+      `<span data-type="2">us:[${us || nosm}]</span>`,
     ].join('');
     body.appendChild(header);
     header.addEventListener('click', (e) => {
