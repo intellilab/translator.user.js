@@ -13,12 +13,19 @@ const styles = process.env.STYLES;
 GM_addStyle(process.env.CSS);
 const translator = initialize();
 
-const entities = {
-  '<': '&lt;',
-  '&': '&amp;',
-};
-function htmlEntities(str) {
-  return str && str.replace(/[<&]/g, char => entities[char]);
+function createElement(tagName, props, attrs) {
+  const el = document.createElement(tagName);
+  if (props) {
+    Object.keys(props).forEach(key => {
+      el[key] = props[key];
+    });
+  }
+  if (attrs) {
+    Object.keys(attrs).forEach(key => {
+      el.setAttribute(key, attrs[key]);
+    });
+  }
+  return el;
 }
 
 function render(data) {
@@ -26,15 +33,16 @@ function render(data) {
   body.innerHTML = '';
   const { basic, query, translation } = data;
   if (basic) {
-    const { 'us-phonetic': us, 'uk-phonetic': uk, explains } = basic;
-    const nosm = '&hearts;';
-    const header = document.createElement('div');
-    header.className = styles.header;
-    header.innerHTML = [
-      `<span>${htmlEntities(query)}</span>`,
-      `<span data-type="1">uk:[${uk || nosm}]</span>`,
-      `<span data-type="2">us:[${us || nosm}]</span>`,
-    ].join('');
+    const {
+      explains,
+      'us-phonetic': us,
+      'uk-phonetic': uk,
+    } = basic;
+    const noPhonetic = '&hearts;';
+    const header = createElement('div', { className: styles.header });
+    header.appendChild(createElement('span', { textContent: query }));
+    header.appendChild(createElement('span', { innerHTML: `uk: [${uk || noPhonetic}]` }, { 'data-type': 1 }));
+    header.appendChild(createElement('span', { innerHTML: `us: [${us || noPhonetic}]` }, { 'data-type': 2 }));
     body.appendChild(header);
     header.addEventListener('click', (e) => {
       const { type } = e.target.dataset;
@@ -43,18 +51,15 @@ function render(data) {
       }
     });
     if (explains) {
-      const ul = document.createElement('ul');
-      ul.className = styles.detail;
+      const ul = createElement('ul', { className: styles.detail });
       for (let i = 0; i < explains.length; i += 1) {
-        const li = document.createElement('li');
-        li.innerHTML = explains[i];
+        const li = createElement('li', { innerHTML: explains[i] });
         ul.appendChild(li);
       }
       body.appendChild(ul);
     }
   } else if (translation) {
-    const div = document.createElement('div');
-    div.innerHTML = translation[0];
+    const div = createElement('div', { innerHTML: translation[0] });
     body.appendChild(div);
   }
 }
@@ -68,9 +73,21 @@ function translate(e) {
     ['input', 'textarea'].indexOf(activeElement.tagName.toLowerCase()) < 0
     && !activeElement.contains(sel.getRangeAt(0).startContainer)
   ) return;
+  const query = {
+    type: 'data',
+    doctype: 'json',
+    version: '1.1',
+    relatedUrl: 'http://fanyi.youdao.com/',
+    keyfrom: 'fanyiweb',
+    key: null,
+    translate: 'on',
+    q: text,
+    ts: Date.now(),
+  };
+  const qs = Object.keys(query).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`).join('&');
   GM_xmlhttpRequest({
     method: 'GET',
-    url: `https://fanyi.youdao.com/openapi.do?relatedUrl=http%3A%2F%2Ffanyi.youdao.com%2Fopenapi%3Fpath%3Dweb-mode&keyfrom=test&key=null&type=data&doctype=json&version=1.1&q=${encodeURIComponent(text)}`,
+    url: `https://fanyi.youdao.com/openapi.do?${qs}`,
     onload(res) {
       const data = JSON.parse(res.responseText);
       if (!data.errorCode) {
@@ -110,12 +127,9 @@ function debounce(func, delay) {
 }
 
 function initialize() {
-  const audio = document.createElement('audio');
-  audio.autoplay = true;
-  const panel = document.createElement('div');
-  panel.className = styles.panel;
-  const panelBody = document.createElement('div');
-  panelBody.className = styles.body;
+  const audio = createElement('audio', { autoplay: true });
+  const panel = createElement('div', { className: styles.panel });
+  const panelBody = createElement('div', { className: styles.body });
   panel.appendChild(panelBody);
   const debouncedTranslate = debounce(translate);
   let isSelecting;

@@ -32,7 +32,7 @@ gulp.task('js', ['css'], () => {
   return gulp.src('src/app.js')
   .pipe(babel({
     presets: [
-      ['env', {
+      ['@babel/env', {
         targets: {
           browsers: ['chrome >= 45'],
         },
