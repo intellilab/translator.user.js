@@ -1,6 +1,6 @@
 {
   "name": "translator.user.js",
-  "version": "1.5.8",
+  "version": "1.5.9",
   "description": "Translate anything!",
   "scripts": {
     "dev": "gulp watch",
