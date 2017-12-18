@@ -9,8 +9,9 @@
 // @grant GM_xmlhttpRequest
 // ==/UserScript==
 
-const styles = process.env.STYLES;
-GM_addStyle(process.env.CSS);
+import { css, classMap } from './style.css';
+
+GM_addStyle(css);
 const translator = initialize();
 
 function createElement(tagName, props, attrs) {
@@ -39,7 +40,7 @@ function render(data) {
       'uk-phonetic': uk,
     } = basic;
     const noPhonetic = '&hearts;';
-    const header = createElement('div', { className: styles.header });
+    const header = createElement('div', { className: classMap.header });
     header.appendChild(createElement('span', { textContent: query }));
     header.appendChild(createElement('span', { innerHTML: `uk: [${uk || noPhonetic}]` }, { 'data-type': 1 }));
     header.appendChild(createElement('span', { innerHTML: `us: [${us || noPhonetic}]` }, { 'data-type': 2 }));
@@ -51,7 +52,7 @@ function render(data) {
       }
     });
     if (explains) {
-      const ul = createElement('ul', { className: styles.detail });
+      const ul = createElement('ul', { className: classMap.detail });
       for (let i = 0; i < explains.length; i += 1) {
         const li = createElement('li', { innerHTML: explains[i] });
         ul.appendChild(li);
@@ -128,8 +129,8 @@ function debounce(func, delay) {
 
 function initialize() {
   const audio = createElement('audio', { autoplay: true });
-  const panel = createElement('div', { className: styles.panel });
-  const panelBody = createElement('div', { className: styles.body });
+  const panel = createElement('div', { className: classMap.panel });
+  const panelBody = createElement('div', { className: classMap.body });
   panel.appendChild(panelBody);
   const debouncedTranslate = debounce(translate);
   let isSelecting;

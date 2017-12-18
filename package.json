@@ -2,35 +2,37 @@
   "name": "translator.user.js",
   "version": "1.5.9",
   "description": "Translate anything!",
+  "private": true,
+  "license": "ISC",
   "scripts": {
     "dev": "gulp watch",
     "build": "gulp build",
-    "lint": "eslint src"
+    "lint": "gulp lint"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/intellilab/translator.user.js.git"
   },
-  "keywords": [
-    "translate"
-  ],
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/intellilab/translator.user.js/issues"
   },
   "homepage": "https://github.com/intellilab/translator.user.js#readme",
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.34",
-    "@babel/preset-env": "^7.0.0-beta.34",
-    "eslint": "^4.13.0",
+    "@babel/core": "^7.0.0-beta.35",
+    "@babel/preset-env": "^7.0.0-beta.35",
+    "autoprefixer": "^7.2.3",
+    "cssnano": "^3.10.0",
+    "eslint": "^4.13.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
     "gulp": "^3.9.1",
-    "gulp-babel": "^8.0.0-beta.0",
-    "gulp-postcss": "^7.0.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-replace": "^0.6.1",
+    "gulp-eslint": "^4.0.0",
+    "gulp-util": "^3.0.8",
+    "postcss": "^6.0.14",
     "postcss-modules": "^1.1.0",
-    "precss": "^2.0.0"
+    "precss": "^2.0.0",
+    "rollup": "^0.52.2",
+    "rollup-plugin-babel": "4.0.0-beta.0",
+    "rollup-plugin-replace": "^2.0.0"
   }
 }

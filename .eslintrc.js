@@ -1,16 +1,21 @@
 module.exports = {
-  root: true,
+  extends: 'airbnb-base',
   env: {
     browser: true,
   },
-  extends: 'airbnb-base',
-  globals: {
-    GM_addStyle: true,
-    GM_xmlhttpRequest: true,
-  },
+  plugins: [
+    'import'
+  ],
   rules: {
-    'arrow-parens': ['off'],
-    'no-mixed-operators': ['error', {allowSamePrecedence: true}],
     'no-use-before-define': ['error', 'nofunc'],
+    'no-mixed-operators': 0,
+    'arrow-parens': 0,
+    'no-plusplus': 0,
+    'no-param-reassign': 0,
+    'consistent-return': 0,
+  },
+  globals: {
+    GM_addStyle,
+    GM_xmlhttpRequest,
   },
 };
