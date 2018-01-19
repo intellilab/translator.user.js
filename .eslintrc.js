@@ -13,9 +13,12 @@ module.exports = {
     'no-plusplus': 0,
     'no-param-reassign': 0,
     'consistent-return': 0,
+    'no-console': ['warn', {
+      allow: ['error', 'warn', 'info'],
+    }],
   },
   globals: {
-    GM_addStyle,
-    GM_xmlhttpRequest,
+    GM_addStyle: true,
+    GM_xmlhttpRequest: true,
   },
 };

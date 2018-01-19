@@ -1,6 +1,6 @@
 const path = require('path');
 const gulp = require('gulp');
-const gutil = require('gulp-util');
+const log = require('fancy-log');
 const eslint = require('gulp-eslint');
 const rollup = require('rollup');
 const postcss = require('postcss');
@@ -53,28 +53,30 @@ const rollupOptions = {
   ],
 };
 
-gulp.task('js', () => {
+function buildJs() {
   return rollup.rollup(Object.assign({
-    input: 'src/app.js',
+    input: 'src/index.js',
   }, rollupOptions))
   .then(bundle => bundle.write({
-    file: `${DIST}/app.user.js`,
-    format: 'iife',
+    file: `${DIST}/translator.user.js`,
+    format: 'cjs',
   }))
   .catch(err => {
-    gutil.log(err.toString());
+    log(err.toString());
   });
-});
+}
 
-gulp.task('lint', () => {
+function lint() {
   return gulp.src('src/**/*.js')
   .pipe(eslint())
   .pipe(eslint.format())
   .pipe(eslint.failAfterError());
-});
+}
 
-gulp.task('build', ['js']);
+function watch() {
+  gulp.watch('src/**', buildJs);
+}
 
-gulp.task('watch', ['build'], () => {
-  gulp.watch('src/**', ['js']);
-});
+exports.lint = lint;
+exports.build = buildJs;
+exports.watch = gulp.series(buildJs, watch);
