@@ -7,6 +7,7 @@
 // @run-at document-start
 // @grant GM_addStyle
 // @grant GM_xmlhttpRequest
+// @include *
 // ==/UserScript==
 
 import { css, classMap } from './style.css';
