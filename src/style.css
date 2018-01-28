@@ -25,7 +25,7 @@
   padding: 0 0 8px;
   border-bottom: 1px dashed #aaa;
   color: #333;
-  > [data-type] {
+  > [data-type], a {
     margin-left: 8px;
     color: #7cbef0;
     cursor: pointer;

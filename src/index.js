@@ -45,6 +45,7 @@ function render(data) {
     header.appendChild(createElement('span', { textContent: query }));
     header.appendChild(createElement('span', { innerHTML: `uk: [${uk || noPhonetic}]` }, { 'data-type': 1 }));
     header.appendChild(createElement('span', { innerHTML: `us: [${us || noPhonetic}]` }, { 'data-type': 2 }));
+    header.appendChild(createElement('a', { textContent: '详情' }, { target: '_blank', href: `http://dict.youdao.com/search?q=${query}` }));
     body.appendChild(header);
     header.addEventListener('click', (e) => {
       const { type } = e.target.dataset;
