@@ -7,6 +7,7 @@
 // @run-at document-start
 // @grant GM_addStyle
 // @grant GM_xmlhttpRequest
+// @include *
 // ==/UserScript==
 
 import { css, classMap } from './style.css';
@@ -42,8 +43,9 @@ function render(data) {
     const noPhonetic = '&hearts;';
     const header = createElement('div', { className: classMap.header });
     header.appendChild(createElement('span', { textContent: query }));
-    header.appendChild(createElement('span', { innerHTML: `uk: [${uk || noPhonetic}]` }, { 'data-type': 1 }));
-    header.appendChild(createElement('span', { innerHTML: `us: [${us || noPhonetic}]` }, { 'data-type': 2 }));
+    header.appendChild(createElement('a', { innerHTML: `uk: [${uk || noPhonetic}]` }, { 'data-type': 1 }));
+    header.appendChild(createElement('a', { innerHTML: `us: [${us || noPhonetic}]` }, { 'data-type': 2 }));
+    header.appendChild(createElement('a', { textContent: '详情' }, { target: '_blank', href: `http://dict.youdao.com/search?q=${encodeURIComponent(query)}` }));
     body.appendChild(header);
     header.addEventListener('click', (e) => {
       const { type } = e.target.dataset;
