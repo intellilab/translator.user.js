@@ -78,5 +78,5 @@ function watch() {
 }
 
 exports.lint = lint;
-exports.build = buildJs;
+exports.build = gulp.series(lint, buildJs);
 exports.watch = gulp.series(buildJs, watch);
