@@ -8,20 +8,18 @@ translator.user.js
 安装依赖
 ---
 ``` sh
-$ npm i
-# 或
 $ yarn
 ```
 
 开发
 ---
 ``` sh
-$ npm run dev
+$ yarn dev
 ```
 然后使用暴力猴（Violentmonkey）的*跟踪本地文件变化*功能开发。
 
 编译
 ---
 ``` sh
-$ npm run build
+$ yarn build
 ```
