@@ -8,7 +8,8 @@ module.exports = {
     browser: true,
   },
   plugins: [
-    'import'
+    'import',
+    'react',
   ],
   rules: {
     'no-use-before-define': ['error', 'nofunc'],
@@ -21,9 +22,17 @@ module.exports = {
       allow: ['error', 'warn', 'info'],
     }],
     'no-bitwise': ['error', { int32Hint: true }],
+    'no-restricted-syntax': 'off',
+    'react/jsx-uses-react': 'error',
   },
   globals: {
+    VM: true,
     GM_addStyle: true,
     GM_xmlhttpRequest: true,
+  },
+  settings: {
+    react: {
+      pragma: 'h',
+    },
   },
 };

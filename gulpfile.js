@@ -65,7 +65,7 @@ const rollupConfig = [
     output: {
       ...commonConfig.output,
       format: 'cjs',
-      file: `${DIST}/index.js`,
+      file: `${DIST}/translator.user.js`,
     },
   },
 ];

@@ -7,5 +7,6 @@
 // @run-at document-start
 // @grant GM_addStyle
 // @grant GM_xmlhttpRequest
+// @require https://unpkg.com/vm.jsx
 // @include *
 // ==/UserScript==

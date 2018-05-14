@@ -1,23 +1,10 @@
 import './meta';
 import { css, classMap } from './style.css';
 
+const h = VM.createElement;
+
 GM_addStyle(css);
 const translator = initialize();
-
-function createElement(tagName, props, attrs) {
-  const el = document.createElement(tagName);
-  if (props) {
-    Object.keys(props).forEach(key => {
-      el[key] = props[key];
-    });
-  }
-  if (attrs) {
-    Object.keys(attrs).forEach(key => {
-      el.setAttribute(key, attrs[key]);
-    });
-  }
-  return el;
-}
 
 function render(data) {
   const { body, audio } = translator;
@@ -30,28 +17,31 @@ function render(data) {
       'uk-phonetic': uk,
     } = basic;
     const noPhonetic = '&hearts;';
-    const header = createElement('div', { className: classMap.header });
-    header.appendChild(createElement('span', { textContent: query }));
-    header.appendChild(createElement('a', { innerHTML: `uk: [${uk || noPhonetic}]` }, { 'data-type': 1 }));
-    header.appendChild(createElement('a', { innerHTML: `us: [${us || noPhonetic}]` }, { 'data-type': 2 }));
-    header.appendChild(createElement('a', { textContent: '详情' }, { target: '_blank', href: `http://dict.youdao.com/search?q=${encodeURIComponent(query)}` }));
-    body.appendChild(header);
-    header.addEventListener('click', (e) => {
+    const handleClick = e => {
       const { type } = e.target.dataset;
       if (type) {
         audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=${type}`;
       }
-    });
+    };
+    const header = (
+      <div className={classMap.header} onClick={handleClick}>
+        <span>{query}</span>
+        <a data-type="1" dangerouslySetInnerHTML={{ __html: `uk: [${uk || noPhonetic}]` }} />
+        <a data-type="2" dangerouslySetInnerHTML={{ __html: `us: [${us || noPhonetic}]` }} />
+        <a target="_blank" href={`http://dict.youdao.com/search?q=${encodeURIComponent(query)}`}>详情</a>
+      </div>
+    );
+    body.appendChild(header);
     if (explains) {
-      const ul = createElement('ul', { className: classMap.detail });
-      for (let i = 0; i < explains.length; i += 1) {
-        const li = createElement('li', { innerHTML: explains[i] });
-        ul.appendChild(li);
+      const lis = [];
+      for (const item of explains) {
+        lis.push(<li dangerouslySetInnerHTML={{ __html: item }} />);
       }
+      const ul = <ul className={classMap.detail}>{lis}</ul>;
       body.appendChild(ul);
     }
   } else if (translation) {
-    const div = createElement('div', { innerHTML: translation[0] });
+    const div = <div dangerouslySetInnerHTML={{ __html: translation[0] }} />;
     body.appendChild(div);
   }
 }
@@ -119,9 +109,9 @@ function debounce(func, delay) {
 }
 
 function initialize() {
-  const audio = createElement('audio', { autoplay: true });
-  const panel = createElement('div', { className: classMap.panel });
-  const panelBody = createElement('div', { className: classMap.body });
+  const audio = <audio autoplay />;
+  const panel = <div className={classMap.panel} />;
+  const panelBody = <div className={classMap.body} />;
   panel.appendChild(panelBody);
   const debouncedTranslate = debounce(translate);
   let isSelecting;

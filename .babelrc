@@ -8,6 +8,9 @@
     }],
   ],
   "plugins": [
-    "@babel/plugin-external-helpers"
+    "@babel/plugin-external-helpers",
+    ["@babel/plugin-transform-react-jsx", {
+      "pragma": "h",
+    }],
   ],
 }
