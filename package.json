@@ -6,28 +6,37 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "dev": "gulp watch",
-    "build": "gulp build",
-    "lint": "gulp lint",
-    "prepush": "npm run lint"
+    "dev": "gulp dev",
+    "prebuild": "yarn lint && gulp clean",
+    "build": "cross-env NODE_ENV=production gulp build",
+    "lint": "eslint ."
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.38",
-    "@babel/preset-env": "^7.0.0-beta.38",
-    "autoprefixer": "^7.2.5",
-    "cssnano": "^3.10.0",
-    "eslint": "^4.15.0",
+    "@babel/core": "^7.0.0-beta.46",
+    "@babel/plugin-external-helpers": "^7.0.0-beta.46",
+    "@babel/preset-env": "^7.0.0-beta.46",
+    "@babel/preset-stage-2": "^7.0.0-beta.46",
+    "autoprefixer": "^8.5.0",
+    "babel-eslint": "^8.2.3",
+    "cross-env": "^5.1.5",
+    "cssnano": "^4.0.0-rc.2",
+    "del": "^3.0.0",
+    "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-import": "^2.11.0",
     "fancy-log": "^1.3.2",
     "gulp": "^4.0.0",
-    "gulp-eslint": "^4.0.1",
-    "husky": "^0.14.3",
-    "postcss": "^6.0.16",
+    "husky": "^1.0.0-rc.4",
+    "postcss": "^6.0.22",
     "postcss-modules": "^1.1.0",
-    "precss": "^3.0.0",
-    "rollup": "^0.54.1",
-    "rollup-plugin-babel": "^4.0.0-beta.0",
+    "precss": "^3.1.2",
+    "rollup": "^0.58.2",
+    "rollup-plugin-babel": "^4.0.0-beta.4",
     "rollup-plugin-replace": "^2.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn lint"
+    }
   }
 }

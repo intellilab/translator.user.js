@@ -1,8 +1,10 @@
 const path = require('path');
 const gulp = require('gulp');
 const log = require('fancy-log');
-const eslint = require('gulp-eslint');
 const rollup = require('rollup');
+const del = require('del');
+const babel = require('rollup-plugin-babel');
+const replace = require('rollup-plugin-replace');
 const postcss = require('postcss');
 const autoprefixer = require('autoprefixer');
 const precss = require('precss');
@@ -30,53 +32,62 @@ const postcssPlugins = [
   IS_PROD && cssnano(),
 ].filter(Boolean);
 
-const rollupOptions = {
-  plugins: [
-    {
-      transform(code, id) {
-        if (path.extname(id) !== '.css') return;
-        return postcss(postcssPlugins).process(code, { from: id })
-        .then(result => {
-          const classMap = cssExportMap[id];
-          return [
-            `export const css = ${JSON.stringify(result.css)};`,
-            classMap && `export const classMap = ${JSON.stringify(classMap)};`,
-          ].filter(Boolean).join('\n');
-        });
+const commonConfig = {
+  input: {
+    plugins: [
+      {
+        transform(code, id) {
+          if (path.extname(id) !== '.css') return;
+          return postcss(postcssPlugins).process(code, { from: id })
+          .then(result => {
+            const classMap = cssExportMap[id];
+            return [
+              `export const css = ${JSON.stringify(result.css)};`,
+              classMap && `export const classMap = ${JSON.stringify(classMap)};`,
+            ].filter(Boolean).join('\n');
+          });
+        },
       },
-    },
-    require('rollup-plugin-babel')({
-      runtimeHelpers: true,
-      exclude: 'node_modules/**',
-    }),
-    require('rollup-plugin-replace')({ values }),
-  ],
+      babel({
+        exclude: 'node_modules/**',
+        externalHelpers: true,
+      }),
+      replace({ values }),
+    ],
+  },
 };
+const rollupConfig = [
+  {
+    input: {
+      ...commonConfig.input,
+      input: 'src/index.js',
+    },
+    output: {
+      ...commonConfig.output,
+      format: 'cjs',
+      file: `${DIST}/index.js`,
+    },
+  },
+];
 
-function buildJs() {
-  return rollup.rollup(Object.assign({
-    input: 'src/index.js',
-  }, rollupOptions))
-  .then(bundle => bundle.write({
-    file: `${DIST}/translator.user.js`,
-    format: 'cjs',
-  }))
-  .catch(err => {
-    log(err.toString());
-  });
+function clean() {
+  return del(DIST);
 }
 
-function lint() {
-  return gulp.src('src/**/*.js')
-  .pipe(eslint())
-  .pipe(eslint.format())
-  .pipe(eslint.failAfterError());
+function buildJs() {
+  return Promise.all(rollupConfig.map(config => {
+    return rollup.rollup(config.input)
+    .then(bundle => bundle.write(config.output))
+    .catch(err => {
+      log(err.toString());
+    });
+  }));
 }
 
 function watch() {
   gulp.watch('src/**', buildJs);
 }
 
-exports.lint = lint;
-exports.build = gulp.series(lint, buildJs);
-exports.watch = gulp.series(buildJs, watch);
+exports.clean = clean;
+exports.build = buildJs;
+exports.dev = gulp.series(buildJs, watch);

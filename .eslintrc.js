@@ -1,5 +1,9 @@
 module.exports = {
   extends: 'airbnb-base',
+  parser: 'babel-eslint',
+  parserOptions: {
+    sourceType: 'module'
+  },
   env: {
     browser: true,
   },
@@ -16,6 +20,7 @@ module.exports = {
     'no-console': ['warn', {
       allow: ['error', 'warn', 'info'],
     }],
+    'no-bitwise': ['error', { int32Hint: true }],
   },
   globals: {
     GM_addStyle: true,
