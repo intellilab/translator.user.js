@@ -22,17 +22,19 @@ module.exports = {
       allow: ['error', 'warn', 'info'],
     }],
     'no-bitwise': ['error', { int32Hint: true }],
-    'no-restricted-syntax': 'off',
+    indent: ['error', 2, { MemberExpression: 0 }],
     'react/jsx-uses-react': 'error',
-  },
-  globals: {
-    VM: true,
-    GM_addStyle: true,
-    GM_xmlhttpRequest: true,
+    'react/react-in-jsx-scope': 'error',
+    'no-restricted-syntax': 'off',
   },
   settings: {
     react: {
       pragma: 'h',
     },
+  },
+  globals: {
+    VM: true,
+    GM_addStyle: true,
+    GM_xmlhttpRequest: true,
   },
 };

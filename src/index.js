@@ -1,5 +1,5 @@
 import './meta';
-import { css, classMap } from './style.css';
+import { css, classMap } from './style.module.css';
 
 const h = VM.createElement;
 
