@@ -119,7 +119,7 @@ function initialize() {
   let isSelecting;
   document.addEventListener('mousedown', (e) => {
     isSelecting = false;
-    if (panel.contains(e.target)) return;
+    if (e.target === root) return;
     root.remove();
     panelBody.innerHTML = '';
   }, true);
