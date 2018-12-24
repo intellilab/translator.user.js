@@ -2,12 +2,10 @@
   position: fixed;
   max-width: 300px;
   z-index: 10000;
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+  color: #333;
+  font-size: 14px;
 }
+
 .body {
   position: relative;
   padding: 8px;
@@ -17,28 +15,27 @@
   color: #555;
   background-color: #fff;
   font-family: monospace, consolas;
-  font-size: 14px;
-  text-align: left;
   word-break: break-all;
 }
+
 .header {
   padding: 0 0 8px;
   border-bottom: 1px dashed #aaa;
-  color: #333;
   > a {
     margin-left: 8px;
     color: #7cbef0;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 12px;
   }
 }
+
 .detail {
   margin: 8px 0 0;
+  padding: 0;
   line-height: 22px;
   list-style: none;
-  font-size: 13px;
+  font-size: 12px;
   > li {
-    font-size: 13px;
     line-height: 26px;
   }
 }

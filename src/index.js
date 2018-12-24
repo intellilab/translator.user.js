@@ -1,9 +1,8 @@
 import './meta';
-import { css, classMap } from './style.module.css';
+import { css } from './style.css';
 
 const h = VM.createElement;
 
-GM_addStyle(css);
 const translator = initialize();
 
 function render(data) {
@@ -24,25 +23,25 @@ function render(data) {
       }
     };
     const header = (
-      <div className={classMap.header} onClick={handleClick}>
+      <div className="header" onClick={handleClick}>
         <span>{query}</span>
         <a data-type="1" dangerouslySetInnerHTML={{ __html: `uk: [${uk || noPhonetic}]` }} />
         <a data-type="2" dangerouslySetInnerHTML={{ __html: `us: [${us || noPhonetic}]` }} />
         <a target="_blank" href={`http://dict.youdao.com/search?q=${encodeURIComponent(query)}`}>详情</a>
       </div>
     );
-    body.appendChild(header);
+    body.append(header);
     if (explains) {
       const lis = [];
       for (const item of explains) {
         lis.push(<li dangerouslySetInnerHTML={{ __html: item }} />);
       }
-      const ul = <ul className={classMap.detail}>{lis}</ul>;
-      body.appendChild(ul);
+      const ul = <ul className="detail">{lis}</ul>;
+      body.append(ul);
     }
   } else if (translation) {
     const div = <div dangerouslySetInnerHTML={{ __html: translation[0] }} />;
-    body.appendChild(div);
+    body.append(div);
   }
 }
 
@@ -74,7 +73,7 @@ function translate(e) {
       const data = JSON.parse(res.responseText);
       if (!data.errorCode) {
         render(data);
-        const { panel } = translator;
+        const { root, panel } = translator;
         const { innerWidth, innerHeight } = window;
         if (e.clientY > innerHeight * 0.5) {
           panel.style.top = 'auto';
@@ -90,7 +89,7 @@ function translate(e) {
           panel.style.left = `${e.clientX}px`;
           panel.style.right = 'auto';
         }
-        document.body.appendChild(panel);
+        document.body.append(root);
       }
     },
   });
@@ -110,15 +109,18 @@ function debounce(func, delay) {
 
 function initialize() {
   const audio = <audio autoplay />;
-  const panel = <div className={classMap.panel} />;
-  const panelBody = <div className={classMap.body} />;
-  panel.appendChild(panelBody);
+  const root = <div id="translator.user.js" />;
+  const shadow = root.attachShadow({ mode: 'open' });
+  const panel = <div className="panel" />;
+  const panelBody = <div className="body" />;
+  shadow.append(<style>{css}</style>, panel);
+  panel.append(panelBody);
   const debouncedTranslate = debounce(translate);
   let isSelecting;
   document.addEventListener('mousedown', (e) => {
     isSelecting = false;
     if (panel.contains(e.target)) return;
-    if (panel.parentNode) panel.parentNode.removeChild(panel);
+    root.remove();
     panelBody.innerHTML = '';
   }, true);
   document.addEventListener('mousemove', () => {
@@ -135,6 +137,7 @@ function initialize() {
 
   return {
     audio,
+    root,
     panel,
     body: panelBody,
   };
