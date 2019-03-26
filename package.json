@@ -4,53 +4,49 @@
   "description": "Translate anything!",
   "author": "",
   "license": "ISC",
-  "scripts": {
-    "dev": "gulp dev",
-    "prebuild": "yarn lint && gulp clean",
-    "build": "cross-env NODE_ENV=production gulp build",
-    "lint": "eslint ."
-  },
   "husky": {
     "hooks": {
       "pre-push": "yarn lint"
     }
   },
+  "scripts": {
+    "dev": "rollup -wc rollup.conf.js",
+    "prebuild": "npm run ci && npm run clean",
+    "build": "npm run build:js",
+    "lint": "eslint .",
+    "ci": "npm run lint",
+    "clean": "del dist",
+    "build:js": "rollup -c rollup.conf.js",
+    "prepublishOnly": "npm run build"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
-    "@babel/core": "^7.1.0",
-    "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/plugin-proposal-decorators": "^7.1.0",
-    "@babel/plugin-proposal-export-namespace-from": "^7.0.0",
-    "@babel/plugin-proposal-function-sent": "^7.1.0",
-    "@babel/plugin-proposal-json-strings": "^7.0.0",
-    "@babel/plugin-proposal-numeric-separator": "^7.0.0",
-    "@babel/plugin-proposal-throw-expressions": "^7.0.0",
-    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
-    "@babel/plugin-syntax-import-meta": "^7.0.0",
-    "@babel/plugin-transform-react-jsx": "^7.0.0",
-    "@babel/plugin-transform-runtime": "^7.1.0",
-    "@babel/preset-env": "^7.1.0",
-    "autoprefixer": "^9.1.5",
-    "babel-eslint": "^9.0.0",
+    "@gera2ld/plaid": "~1.4.0",
+    "@gera2ld/plaid-react": "~1.4.0",
+    "babel-eslint": "^10.0.1",
     "cross-env": "^5.2.0",
-    "cssnano": "^4.1.0",
-    "del": "^3.0.0",
-    "eslint": "^5.6.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-react": "^7.11.1",
-    "fancy-log": "^1.3.2",
-    "gulp": "^4.0.0",
-    "husky": "^1.0.0-rc.14",
-    "postcss": "^7.0.2",
-    "postcss-modules": "^1.3.2",
-    "precss": "^3.1.2",
-    "rollup": "^0.66.2",
-    "rollup-plugin-babel": "^4.0.3",
-    "rollup-plugin-commonjs": "^9.1.8",
-    "rollup-plugin-node-resolve": "^3.4.0",
-    "rollup-plugin-replace": "^2.0.0"
+    "cssnano": "^4.1.10",
+    "del-cli": "^1.1.0",
+    "eslint": "^5.16.0",
+    "eslint-import-resolver-babel-module": "^5.1.0",
+    "husky": "^2.3.0",
+    "postcss": "^7.0.16",
+    "postcss-modules": "^1.4.1",
+    "rollup": "^1.12.0",
+    "rollup-plugin-alias": "^1.5.1",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-node-resolve": "^5.0.0",
+    "rollup-plugin-replace": "^2.2.0"
   },
   "dependencies": {
-    "@babel/runtime": "^7.0.0"
+    "@babel/runtime": "^7.4.4",
+    "@gera2ld/jsx-dom": "^1.1.1"
   }
 }

@@ -1,8 +1,6 @@
 import './meta';
 import { css } from './style.css';
 
-const h = VM.createElement;
-
 const translator = initialize();
 
 function render(data) {
@@ -16,7 +14,7 @@ function render(data) {
       'uk-phonetic': uk,
     } = basic;
     const noPhonetic = '&hearts;';
-    const handleClick = e => {
+    const handleClick = (e) => {
       const { type } = e.target.dataset;
       if (type) {
         audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=${type}`;
@@ -27,7 +25,7 @@ function render(data) {
         <span>{query}</span>
         <a data-type="1" dangerouslySetInnerHTML={{ __html: `uk: [${uk || noPhonetic}]` }} />
         <a data-type="2" dangerouslySetInnerHTML={{ __html: `us: [${us || noPhonetic}]` }} />
-        <a target="_blank" href={`http://dict.youdao.com/search?q=${encodeURIComponent(query)}`}>详情</a>
+        <a target="_blank" rel="noopener noreferrer" href={`http://dict.youdao.com/search?q=${encodeURIComponent(query)}`}>详情</a>
       </div>
     );
     body.append(header);
@@ -108,7 +106,7 @@ function debounce(func, delay) {
 }
 
 function initialize() {
-  const audio = <audio autoplay />;
+  const audio = <audio autoPlay />;
   const root = <div id="translator.user.js" />;
   const shadow = root.attachShadow({ mode: 'open' });
   const panel = <div className="panel" />;

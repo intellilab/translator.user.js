@@ -4,35 +4,18 @@ const babel = require('rollup-plugin-babel');
 const replace = require('rollup-plugin-replace');
 const resolve = require('rollup-plugin-node-resolve');
 const commonjs = require('rollup-plugin-commonjs');
+const alias = require('rollup-plugin-alias');
 const postcss = require('postcss');
-const autoprefixer = require('autoprefixer');
-const precss = require('precss');
 const cssModules = require('postcss-modules');
-const cssnano = require('cssnano');
 const pkg = require('../package.json');
 
-const IS_PROD = process.env.NODE_ENV === 'production';
 const values = {
   'process.env.VERSION': pkg.version,
-  'process.env.NODE_ENV': process.env.NODE_ENV || 'development',
 };
 
-const postcssPluginMap = {
-  precss: () => precss(),
-  autoprefixer: () => autoprefixer(),
-  cssModules: ({ cssMap }) => cssModules({
-    getJSON(id, json) {
-      cssMap[id] = json;
-    },
-  }),
-  cssnano: () => cssnano(),
-};
-const postcssPlugins = {
-  css: getPostcssPlugins(),
-  cssModules: getPostcssPlugins({ cssModules: true }),
-};
 const rollupPluginMap = {
   css: () => cssPlugin(),
+  alias: aliases => alias(aliases),
   babel: ({ babelConfig, browser }) => babel({
     ...browser ? {
       // Combine all helpers at the top of the bundle
@@ -52,15 +35,13 @@ const rollupPluginMap = {
   commonjs: () => commonjs(),
 };
 
-exports.getRollupPlugins = getRollupPlugins;
-exports.getExternal = getExternal;
-
 function getPostcssPlugins({ cssModules } = {}) {
   return [
-    postcssPluginMap.precss(),
-    postcssPluginMap.autoprefixer(),
-    cssModules && postcssPluginMap.cssModules(cssModules),
-    IS_PROD && postcssPluginMap.cssnano(),
+    require('precss'),
+    require('postcss-color-function'),
+    require('postcss-calc'),
+    cssModules && require('postcss-modules')(cssModules),
+    require('cssnano'),
   ].filter(Boolean);
 }
 
@@ -96,7 +77,10 @@ function cssPlugin() {
         plugins = postcssPlugins.css;
       }
       if (plugins) {
-        return postcss(plugins).process(code, { from: filename })
+        return postcss(plugins).process(code, {
+          from: filename,
+          parser: require('postcss-scss'),
+        })
         .then(result => {
           const classMap = cssMap[filename];
           return [
@@ -109,16 +93,21 @@ function cssPlugin() {
   };
 }
 
-function getRollupPlugins({ babelConfig, browser } = {}) {
+function getRollupPlugins({ babelConfig, browser, aliases } = {}) {
   return [
+    aliases && rollupPluginMap.alias(aliases),
     rollupPluginMap.css(),
     rollupPluginMap.babel({ babelConfig, browser }),
     rollupPluginMap.replace(),
     rollupPluginMap.resolve(),
     rollupPluginMap.commonjs(),
-  ];
+  ].filter(Boolean);
 }
 
 function getExternal(externals = []) {
   return id => id.startsWith('@babel/runtime/') || externals.includes(id);
 }
+
+exports.getRollupPlugins = getRollupPlugins;
+exports.getExternal = getExternal;
+exports.DIST = 'dist';
