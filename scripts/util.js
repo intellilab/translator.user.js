@@ -55,7 +55,9 @@ function cssPlugin() {
     name: 'CSSPlugin',
     resolveId(importee, importer) {
       if (importee.endsWith('.css')) {
-        return path.resolve(path.dirname(importer), `${importee}.js`);
+        const cssId = path.resolve(path.dirname(importer), importee);
+        this.addWatchFile(cssId);
+        return `${cssId}.js`;
       }
     },
     load(id) {

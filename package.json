@@ -2,6 +2,7 @@
   "name": "translator.user.js",
   "version": "1.5.14",
   "description": "Translate anything!",
+  "private": true,
   "author": "",
   "license": "ISC",
   "husky": {
