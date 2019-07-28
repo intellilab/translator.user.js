@@ -60,14 +60,14 @@ function translate(e, panel, audio) {
       url: 'https://cn.bing.com/ttranslatev3',
       data: `fromLang=auto-detect&to=zh-Hans&text=${text}`,
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       onload(res) {
         if (res.status !== 200) return;
         const data = JSON.parse(res.responseText);
         // 与有道词典结果格式保持一致
         render({
-          translation: [data[0].translations[0].text]
+          translation: [data[0].translations[0].text],
         }, panel, audio);
         const { wrapper } = panel;
         const { innerWidth, innerHeight } = window;
@@ -86,7 +86,7 @@ function translate(e, panel, audio) {
           wrapper.style.right = 'auto';
         }
         panel.show();
-      }
+      },
     });
   } else {
     const query = {
