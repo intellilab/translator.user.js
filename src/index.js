@@ -1,4 +1,3 @@
-import './meta';
 import { css } from './style.css';
 
 function render(data, panel, audio) {

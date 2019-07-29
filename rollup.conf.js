@@ -1,9 +1,10 @@
+const fs = require('fs');
 const rollup = require('rollup');
 const { getRollupPlugins, getExternal, DIST } = require('./scripts/util');
 const pkg = require('./package.json');
 
 const FILENAME = 'translator';
-const BANNER = false;
+const BANNER = fs.readFileSync('src/meta.js', 'utf8');
 
 const external = getExternal();
 const rollupConfig = [
