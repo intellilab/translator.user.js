@@ -4,7 +4,8 @@ const { getRollupPlugins, getExternal, DIST } = require('./scripts/util');
 const pkg = require('./package.json');
 
 const FILENAME = 'translator';
-const BANNER = fs.readFileSync('src/meta.js', 'utf8');
+const BANNER = fs.readFileSync('src/meta.js', 'utf8')
+.replace('process.env.VERSION', pkg.version);
 
 const external = getExternal();
 const rollupConfig = [
