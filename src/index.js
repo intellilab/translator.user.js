@@ -41,7 +41,7 @@ function render(data, panel, audio) {
 
 function translate(e, panel, audio) {
   const sel = window.getSelection();
-  const text = sel.toString();
+  const text = sel.toString().trim();
   if (/^\s*$/.test(text)) return;
   const { activeElement } = document;
   if (
