@@ -3,16 +3,7 @@ module.exports = {
   presets: [
   ],
   plugins: [
-    ['module-resolver', {
-      alias: {
-        '#': './src',
-      },
-    }],
-
-    // react
-    ['@babel/plugin-transform-react-jsx', {
-      pragma: 'VM.createElement',
-      pragmaFrag: 'VM.Fragment',
-    }],
+    // JSX
+    '@babel/plugin-transform-react-jsx',
   ].filter(Boolean),
 };

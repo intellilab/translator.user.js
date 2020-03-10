@@ -1,4 +1,6 @@
-import { css } from './style.css';
+import css from './style.css';
+
+const React = VM;
 
 function render(data, panel, audio) {
   const { basic, query, translation } = data;
