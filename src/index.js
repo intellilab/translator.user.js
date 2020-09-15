@@ -58,7 +58,7 @@ function translate(e, panel, audio) {
   if (/\s/.test(text)) {
     GM_xmlhttpRequest({
       method: 'POST',
-      url: 'https://cn.bing.com/ttranslatev3',
+      url: 'https://www.bing.com/ttranslatev3',
       data: `fromLang=auto-detect&to=zh-Hans&text=${text}`,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
