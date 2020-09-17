@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "rollup -wc rollup.conf.js",
     "prebuild": "npm run ci && npm run clean",
-    "build": "npm run build:js",
+    "build": "npm run build:js --production",
     "lint": "eslint .",
     "ci": "npm run lint",
     "clean": "del dist",
@@ -24,13 +24,13 @@
     "access": "public"
   },
   "devDependencies": {
-    "@gera2ld/plaid": "^2.0.0",
-    "@gera2ld/plaid-common-react": "^2.0.0",
-    "@gera2ld/plaid-rollup": "^2.0.0",
-    "del-cli": "^3.0.0",
-    "husky": "^4.2.3"
+    "@gera2ld/plaid": "~2.0.7",
+    "@gera2ld/plaid-common-react": "~2.0.7",
+    "@gera2ld/plaid-rollup": "~2.1.1",
+    "del-cli": "^3.0.1",
+    "husky": "^4.3.0"
   },
   "dependencies": {
-    "@babel/runtime": "^7.8.7"
+    "@babel/runtime": "^7.11.2"
   }
 }
