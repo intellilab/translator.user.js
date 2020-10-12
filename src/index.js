@@ -1,4 +1,4 @@
-import css from './style.css';
+import styles, { stylesheet } from './style.module.css';
 
 const React = VM;
 
@@ -19,7 +19,7 @@ function render(data, panel, audio) {
       }
     };
     const header = (
-      <div className="header" onClick={handleClick}>
+      <div className={styles.header} onClick={handleClick}>
         <span>{query}</span>
         <a data-type="1" dangerouslySetInnerHTML={{ __html: `uk: [${uk || noPhonetic}]` }} />
         <a data-type="2" dangerouslySetInnerHTML={{ __html: `us: [${us || noPhonetic}]` }} />
@@ -30,9 +30,9 @@ function render(data, panel, audio) {
     if (explains) {
       const lis = [];
       for (const item of explains) {
-        lis.push(<li dangerouslySetInnerHTML={{ __html: item }} />);
+        lis.push(<div dangerouslySetInnerHTML={{ __html: item }} />);
       }
-      const ul = <ul className="detail">{lis}</ul>;
+      const ul = <div className={styles.detail}>{lis}</div>;
       panel.append(ul);
     }
   } else if (translation) {
@@ -146,7 +146,7 @@ function debounce(func, delay) {
 
 function initialize() {
   const audio = <audio autoPlay />;
-  const panel = VM.getPanel({ css });
+  const panel = VM.getPanel({ css: stylesheet, shadow: false });
   const debouncedTranslate = debounce(e => translate(e, panel, audio));
   let isSelecting;
   document.addEventListener('mousedown', (e) => {
