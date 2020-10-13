@@ -11,15 +11,18 @@ const bundleOptions = {
   extend: true,
   esModule: false,
 };
+const postcssOptions = {
+  ...require('@gera2ld/plaid/config/postcssrc'),
+  inject: false,
+  minimize: true,
+};
 const rollupConfig = [
   {
     input: {
       input: 'src/index.js',
       plugins: getRollupPlugins({
         esm: true,
-        postcss: {
-          inject: false,
-        },
+        postcss: postcssOptions,
       }),
     },
     output: {

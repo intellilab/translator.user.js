@@ -1,0 +1,32 @@
+:host {
+  .header {
+    padding: 0 0 8px;
+    border-bottom: 1px dashed #aaa;
+    > a {
+      all: initial;
+      display: inline-block;
+      margin: 0 0 0 8px;
+      color: #7cbef0;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+    }
+  }
+
+  .detail {
+    display: block;
+    margin: 8px 0 0;
+    padding: 0;
+    line-height: 22px;
+    list-style: none;
+    font-size: 12px;
+    > * {
+      all: initial;
+      display: block;
+      list-style: none;
+      font-family: inherit;
+      font-size: inherit;
+      line-height: 26px;
+    }
+  }
+}
