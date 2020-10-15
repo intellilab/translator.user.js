@@ -1,3 +1,5 @@
+import { dumpQuery, request } from './util';
+import { provider as googleProvider } from './google';
 import styles, { stylesheet } from './style.module.css';
 
 const React = VM;
@@ -19,7 +21,7 @@ function render(results, { event, panel }) {
   panel.clear();
   for (const [name, result] of Object.entries(results)) {
     const {
-      source, phonetic, detailUrl, explains, translation,
+      source, phonetic, detailUrl, explains, translations,
     } = result;
     panel.append((
       <section className={styles.section}>
@@ -41,8 +43,10 @@ function render(results, { event, panel }) {
             </div>
           )}
           {detailUrl && <div><a target="_blank" rel="noopener noreferrer" href={detailUrl}>更多...</a></div>}
-          {translation && (
-            <div dangerouslySetInnerHTML={{ __html: translation.text }} />
+          {translations && (
+            <div>
+              {translations.map(item => <div dangerouslySetInnerHTML={{ __html: item }} />)}
+            </div>
           )}
         </div>
       </section>
@@ -68,12 +72,6 @@ function render(results, { event, panel }) {
   panel.show();
 }
 
-function dumpQuery(query) {
-  return Object.entries(query)
-    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-    .join('&');
-}
-
 const providers = [
   {
     name: 'youdao',
@@ -89,72 +87,67 @@ const providers = [
         q: text,
         ts: Date.now(),
       };
-      const { basic, query } = await new Promise((resolve, reject) => {
-        GM_xmlhttpRequest({
-          method: 'GET',
-          url: `https://fanyi.youdao.com/openapi.do?${dumpQuery(payload)}`,
-          responseType: 'json',
-          onload(res) {
-            const data = res.response;
-            if (!data.errorCode) resolve(data);
-            else reject();
-          },
-          onerror: reject,
-        });
+      const result = await request({
+        url: 'https://fanyi.youdao.com/openapi.do',
+        params: payload,
+        responseType: 'json',
       });
-      const {
-        explains,
-        'us-phonetic': us,
-        'uk-phonetic': uk,
-      } = basic;
-      const noPhonetic = '&hearts;';
-      return {
-        source: query,
-        phonetic: [
-          {
-            html: `UK: [${uk || noPhonetic}]`,
-            url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=1`,
-          },
-          {
-            html: `US: [${us || noPhonetic}]`,
-            url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=2`,
-          },
-        ],
-        detailUrl: `http://dict.youdao.com/search?q=${encodeURIComponent(query)}`,
-        explains,
-      };
+      if (result.errorCode) throw result;
+      const { basic, query, translation } = result;
+      if (basic) {
+        const noPhonetic = '&hearts;';
+        const {
+          explains,
+          'us-phonetic': us,
+          'uk-phonetic': uk,
+        } = basic;
+        return {
+          source: query,
+          phonetic: [
+            {
+              html: `UK: [${uk || noPhonetic}]`,
+              url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=1`,
+            },
+            {
+              html: `US: [${us || noPhonetic}]`,
+              url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=2`,
+            },
+          ],
+          explains,
+          detailUrl: `http://dict.youdao.com/search?q=${encodeURIComponent(query)}`,
+        };
+      }
+      if (translation?.[0]) {
+        return {
+          source: query,
+          translations: translation,
+        };
+      }
     },
   },
   {
     name: 'bing',
     handle: async (source) => {
-      const [data] = await new Promise((resolve, reject) => {
-        GM_xmlhttpRequest({
-          method: 'POST',
-          url: 'https://cn.bing.com/ttranslatev3',
-          responseType: 'json',
-          data: dumpQuery({
-            fromLang: 'auto-detect',
-            to: 'zh-Hans',
-            text: source,
-          }),
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          onload(res) {
-            if (res.status !== 200) return reject();
-            resolve(res.response);
-          },
-          onerror: reject,
-        });
+      const [data] = await request({
+        method: 'POST',
+        url: 'https://cn.bing.com/ttranslatev3',
+        responseType: 'json',
+        data: dumpQuery({
+          fromLang: 'auto-detect',
+          to: 'zh-Hans',
+          text: source,
+        }),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       });
-      const { text, to } = data.translations[0];
       return {
         source,
-        translation: { text, to },
+        translations: data.translations.map(({ text }) => text),
       };
     },
   },
+  googleProvider,
 ];
 
 let session;
@@ -171,8 +164,10 @@ function translate(context) {
   const results = {};
   session = results;
   providers.forEach(async provider => {
-    results[provider.name] = await provider.handle(text);
-    if (session === results) render(results, context);
+    const result = await provider.handle(text);
+    if (!result || session !== results) return;
+    results[provider.name] = result;
+    render(results, context);
   });
 }
 
