@@ -17,26 +17,29 @@ function getPlayer(url) {
   };
 }
 
-function render(results, { event, panel }) {
+function render(results, { event, panel, source }) {
   panel.clear();
+  panel.append(<section className={styles.source}>{source}</section>);
   for (const [name, result] of Object.entries(results)) {
     const {
-      source, phonetic, detailUrl, explains, translations,
+      query, phonetic, detailUrl, explains, translations,
     } = result;
     panel.append((
       <section className={styles.section}>
         <div className={styles.label}>{name}</div>
         <div className={styles.content}>
-          <div className={styles.header}>
-            <span>{source}</span>
-            {phonetic?.map(({ html, url }) => (
-              <a
-                className={styles.phonetic}
-                dangerouslySetInnerHTML={{ __html: html }}
-                onClick={getPlayer(url)}
-              />
-            ))}
-          </div>
+          {!!(query || phonetic?.length) && (
+            <div>
+              {query && <span>{query}</span>}
+              {phonetic?.map(({ html, url }) => (
+                <a
+                  className={styles.phonetic}
+                  dangerouslySetInnerHTML={{ __html: html }}
+                  onClick={getPlayer(url)}
+                />
+              ))}
+            </div>
+          )}
           {explains && (
             <div>
               {explains.map(item => <div dangerouslySetInnerHTML={{ __html: item }} />)}
@@ -102,7 +105,7 @@ const providers = [
           'uk-phonetic': uk,
         } = basic;
         return {
-          source: query,
+          query,
           phonetic: [
             {
               html: `UK: [${uk || noPhonetic}]`,
@@ -119,7 +122,6 @@ const providers = [
       }
       if (translation?.[0]) {
         return {
-          source: query,
           translations: translation,
         };
       }
@@ -142,7 +144,6 @@ const providers = [
         },
       });
       return {
-        source,
         translations: data.translations.map(({ text }) => text),
       };
     },
@@ -161,6 +162,7 @@ function translate(context) {
     && !activeElement.contains(sel.getRangeAt(0).startContainer)
   ) return;
 
+  context.source = text;
   const results = {};
   session = results;
   providers.forEach(async provider => {

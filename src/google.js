@@ -70,7 +70,7 @@ async function updateTKK() {
     return;
   }
   const text = await request({
-    url: 'https://translate.google.com',
+    url: 'https://translate.google.cn',
   });
   const tkk = text.match(/tkk:'([^']+)'/)[1];
   window.TKK = tkk;
@@ -100,7 +100,6 @@ export const provider = {
       responseType: 'json',
     });
     return {
-      source,
       translations: data[5][0][2].map(([text]) => text),
     };
   },
