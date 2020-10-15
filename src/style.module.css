@@ -1,32 +1,51 @@
 :host {
-  .header {
-    padding: 0 0 8px;
-    border-bottom: 1px dashed #aaa;
-    > a {
-      all: initial;
-      display: inline-block;
-      margin: 0 0 0 8px;
-      color: #7cbef0;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 12px;
+  a {
+    all: initial;
+    color: #7cbef0;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    &:hover {
+      text-decoration: underline;
     }
   }
 
-  .detail {
-    display: block;
-    margin: 8px 0 0;
-    padding: 0;
-    line-height: 22px;
-    list-style: none;
+  .section {
+    display: flex;
+    align-items: flex-start;
     font-size: 12px;
-    > * {
-      all: initial;
-      display: block;
-      list-style: none;
-      font-family: inherit;
-      font-size: inherit;
-      line-height: 26px;
+    line-height: 1.2;
+    &:not(:first-child) {
+      border-top: 1px solid #eee;
     }
+  }
+  .label {
+    display: block;
+    margin: 8px 8px 8px 0;
+    padding: 2px 0;
+    color: white;
+    background: #bbb;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+  }
+  .content {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 0;
+    > * {
+      display: block;
+      &:not(:first-child) {
+        margin-top: 8px;
+      }
+    }
+  }
+
+  .phonetic {
+    display: inline-block;
+    margin-left: 8px;
   }
 }
