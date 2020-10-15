@@ -1,47 +1,164 @@
 import styles, { stylesheet } from './style.module.css';
 
 const React = VM;
+let audio;
 
-function render(data, panel, audio) {
-  const { basic, query, translation } = data;
-  panel.clear();
-  if (basic) {
-    const {
-      explains,
-      'us-phonetic': us,
-      'uk-phonetic': uk,
-    } = basic;
-    const noPhonetic = '&hearts;';
-    const handleClick = (e) => {
-      const { type } = e.target.dataset;
-      if (type) {
-        audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=${type}`;
-      }
-    };
-    const header = (
-      <div className={styles.header} onClick={handleClick}>
-        <span>{query}</span>
-        <a data-type="1" dangerouslySetInnerHTML={{ __html: `uk: [${uk || noPhonetic}]` }} />
-        <a data-type="2" dangerouslySetInnerHTML={{ __html: `us: [${us || noPhonetic}]` }} />
-        <a target="_blank" rel="noopener noreferrer" href={`http://dict.youdao.com/search?q=${encodeURIComponent(query)}`}>详情</a>
-      </div>
-    );
-    panel.append(header);
-    if (explains) {
-      const lis = [];
-      for (const item of explains) {
-        lis.push(<div dangerouslySetInnerHTML={{ __html: item }} />);
-      }
-      const ul = <div className={styles.detail}>{lis}</div>;
-      panel.append(ul);
-    }
-  } else if (translation) {
-    const div = <div dangerouslySetInnerHTML={{ __html: translation[0] }} />;
-    panel.append(div);
-  }
+function play(url) {
+  if (!audio) audio = <audio autoPlay />;
+  audio.src = url;
 }
 
-function translate(e, panel, audio) {
+function getPlayer(url) {
+  return e => {
+    e.preventDefault();
+    play(url);
+  };
+}
+
+function render(results, { event, panel }) {
+  panel.clear();
+  for (const [name, result] of Object.entries(results)) {
+    const {
+      source, phonetic, detailUrl, explains, translation,
+    } = result;
+    panel.append((
+      <section className={styles.section}>
+        <div className={styles.label}>{name}</div>
+        <div className={styles.content}>
+          <div className={styles.header}>
+            <span>{source}</span>
+            {phonetic?.map(({ html, url }) => (
+              <a
+                className={styles.phonetic}
+                dangerouslySetInnerHTML={{ __html: html }}
+                onClick={getPlayer(url)}
+              />
+            ))}
+          </div>
+          {explains && (
+            <div>
+              {explains.map(item => <div dangerouslySetInnerHTML={{ __html: item }} />)}
+            </div>
+          )}
+          {detailUrl && <div><a target="_blank" rel="noopener noreferrer" href={detailUrl}>更多...</a></div>}
+          {translation && (
+            <div dangerouslySetInnerHTML={{ __html: translation.text }} />
+          )}
+        </div>
+      </section>
+    ));
+  }
+  const { wrapper } = panel;
+  const { innerWidth, innerHeight } = window;
+  const { clientX, clientY } = event;
+  if (clientY > innerHeight * 0.5) {
+    wrapper.style.top = 'auto';
+    wrapper.style.bottom = `${innerHeight - clientY + 10}px`;
+  } else {
+    wrapper.style.top = `${clientY + 10}px`;
+    wrapper.style.bottom = 'auto';
+  }
+  if (clientX > innerWidth * 0.5) {
+    wrapper.style.left = 'auto';
+    wrapper.style.right = `${innerWidth - clientX}px`;
+  } else {
+    wrapper.style.left = `${clientX}px`;
+    wrapper.style.right = 'auto';
+  }
+  panel.show();
+}
+
+function dumpQuery(query) {
+  return Object.entries(query)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join('&');
+}
+
+const providers = [
+  {
+    name: 'youdao',
+    handle: async (text) => {
+      const payload = {
+        type: 'data',
+        doctype: 'json',
+        version: '1.1',
+        relatedUrl: 'http://fanyi.youdao.com/',
+        keyfrom: 'fanyiweb',
+        key: null,
+        translate: 'on',
+        q: text,
+        ts: Date.now(),
+      };
+      const { basic, query } = await new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+          method: 'GET',
+          url: `https://fanyi.youdao.com/openapi.do?${dumpQuery(payload)}`,
+          responseType: 'json',
+          onload(res) {
+            const data = res.response;
+            if (!data.errorCode) resolve(data);
+            else reject();
+          },
+          onerror: reject,
+        });
+      });
+      const {
+        explains,
+        'us-phonetic': us,
+        'uk-phonetic': uk,
+      } = basic;
+      const noPhonetic = '&hearts;';
+      return {
+        source: query,
+        phonetic: [
+          {
+            html: `UK: [${uk || noPhonetic}]`,
+            url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=1`,
+          },
+          {
+            html: `US: [${us || noPhonetic}]`,
+            url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=2`,
+          },
+        ],
+        detailUrl: `http://dict.youdao.com/search?q=${encodeURIComponent(query)}`,
+        explains,
+      };
+    },
+  },
+  {
+    name: 'bing',
+    handle: async (source) => {
+      const [data] = await new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+          method: 'POST',
+          url: 'https://cn.bing.com/ttranslatev3',
+          responseType: 'json',
+          data: dumpQuery({
+            fromLang: 'auto-detect',
+            to: 'zh-Hans',
+            text: source,
+          }),
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          onload(res) {
+            if (res.status !== 200) return reject();
+            resolve(res.response);
+          },
+          onerror: reject,
+        });
+      });
+      const { text, to } = data.translations[0];
+      return {
+        source,
+        translation: { text, to },
+      };
+    },
+  },
+];
+
+let session;
+function translate(context) {
   const sel = window.getSelection();
   const text = sel.toString().trim();
   if (/^\s*$/.test(text)) return;
@@ -51,85 +168,12 @@ function translate(e, panel, audio) {
     && !activeElement.contains(sel.getRangeAt(0).startContainer)
   ) return;
 
-  /**
-   * 采用 Bing 翻译句子
-   * PS: 对比了一下有道发现各有千秋或许某个版本会使用有道翻译(不是词典)句子
-    */
-  if (/\s/.test(text)) {
-    GM_xmlhttpRequest({
-      method: 'POST',
-      url: 'https://www.bing.com/ttranslatev3',
-      data: `fromLang=auto-detect&to=zh-Hans&text=${text}`,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      onload(res) {
-        if (res.status !== 200) return;
-        const data = JSON.parse(res.responseText);
-        // 与有道词典结果格式保持一致
-        render({
-          translation: [data[0].translations[0].text],
-        }, panel, audio);
-        const { wrapper } = panel;
-        const { innerWidth, innerHeight } = window;
-        if (e.clientY > innerHeight * 0.5) {
-          wrapper.style.top = 'auto';
-          wrapper.style.bottom = `${innerHeight - e.clientY + 10}px`;
-        } else {
-          wrapper.style.top = `${e.clientY + 10}px`;
-          wrapper.style.bottom = 'auto';
-        }
-        if (e.clientX > innerWidth * 0.5) {
-          wrapper.style.left = 'auto';
-          wrapper.style.right = `${innerWidth - e.clientX}px`;
-        } else {
-          wrapper.style.left = `${e.clientX}px`;
-          wrapper.style.right = 'auto';
-        }
-        panel.show();
-      },
-    });
-  } else {
-    const query = {
-      type: 'data',
-      doctype: 'json',
-      version: '1.1',
-      relatedUrl: 'http://fanyi.youdao.com/',
-      keyfrom: 'fanyiweb',
-      key: null,
-      translate: 'on',
-      q: text,
-      ts: Date.now(),
-    };
-    const qs = Object.keys(query).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`).join('&');
-    GM_xmlhttpRequest({
-      method: 'GET',
-      url: `https://fanyi.youdao.com/openapi.do?${qs}`,
-      onload(res) {
-        const data = JSON.parse(res.responseText);
-        if (!data.errorCode) {
-          render(data, panel, audio);
-          const { wrapper } = panel;
-          const { innerWidth, innerHeight } = window;
-          if (e.clientY > innerHeight * 0.5) {
-            wrapper.style.top = 'auto';
-            wrapper.style.bottom = `${innerHeight - e.clientY + 10}px`;
-          } else {
-            wrapper.style.top = `${e.clientY + 10}px`;
-            wrapper.style.bottom = 'auto';
-          }
-          if (e.clientX > innerWidth * 0.5) {
-            wrapper.style.left = 'auto';
-            wrapper.style.right = `${innerWidth - e.clientX}px`;
-          } else {
-            wrapper.style.left = `${e.clientX}px`;
-            wrapper.style.right = 'auto';
-          }
-          panel.show();
-        }
-      },
-    });
-  }
+  const results = {};
+  session = results;
+  providers.forEach(async provider => {
+    results[provider.name] = await provider.handle(text);
+    if (session === results) render(results, context);
+  });
 }
 
 function debounce(func, delay) {
@@ -145,9 +189,9 @@ function debounce(func, delay) {
 }
 
 function initialize() {
-  const audio = <audio autoPlay />;
   const panel = VM.getPanel({ css: stylesheet, shadow: false });
-  const debouncedTranslate = debounce(e => translate(e, panel, audio));
+  panel.body.style.padding = '0 8px';
+  const debouncedTranslate = debounce(event => translate({ event, panel }));
   let isSelecting;
   document.addEventListener('mousedown', (e) => {
     isSelecting = false;
