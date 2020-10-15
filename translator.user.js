@@ -119,7 +119,7 @@ async function updateTKK() {
   }
 
   const text = await request({
-    url: 'https://translate.google.com'
+    url: 'https://translate.google.cn'
   });
   const tkk = text.match(/tkk:'([^']+)'/)[1];
   window$1.TKK = tkk;
