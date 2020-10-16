@@ -1,4 +1,5 @@
-import { dumpQuery, request } from './util';
+import { request } from './util';
+import { provider as bingProvider } from './bing';
 import { provider as googleProvider } from './google';
 import styles, { stylesheet } from './style.module.css';
 
@@ -42,13 +43,17 @@ function render(results, { event, panel, source }) {
           )}
           {explains && (
             <div>
-              {explains.map(item => <div dangerouslySetInnerHTML={{ __html: item }} />)}
+              {explains.map(item => (
+                <div className={styles.item} dangerouslySetInnerHTML={{ __html: item }} />
+              ))}
             </div>
           )}
           {detailUrl && <div><a target="_blank" rel="noopener noreferrer" href={detailUrl}>更多...</a></div>}
           {translations && (
             <div>
-              {translations.map(item => <div dangerouslySetInnerHTML={{ __html: item }} />)}
+              {translations.map(item => (
+                <div className={styles.item} dangerouslySetInnerHTML={{ __html: item }} />
+              ))}
             </div>
           )}
         </div>
@@ -127,27 +132,7 @@ const providers = [
       }
     },
   },
-  {
-    name: 'bing',
-    handle: async (source) => {
-      const [data] = await request({
-        method: 'POST',
-        url: 'https://cn.bing.com/ttranslatev3',
-        responseType: 'json',
-        data: dumpQuery({
-          fromLang: 'auto-detect',
-          to: 'zh-Hans',
-          text: source,
-        }),
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
-      return {
-        translations: data.translations.map(({ text }) => text),
-      };
-    },
-  },
+  bingProvider,
   googleProvider,
 ];
 
@@ -192,7 +177,7 @@ function initialize() {
   let isSelecting;
   document.addEventListener('mousedown', (e) => {
     isSelecting = false;
-    if (e.target === panel.host) return;
+    if (panel.body.contains(e.target)) return;
     panel.hide();
   }, true);
   document.addEventListener('mousemove', () => {

@@ -54,4 +54,8 @@
     display: inline-block;
     margin-left: 8px;
   }
+
+  .item ~ .item {
+    margin-top: 8px;
+  }
 }
