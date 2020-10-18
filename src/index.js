@@ -179,6 +179,7 @@ function initialize() {
     isSelecting = false;
     if (panel.body.contains(e.target)) return;
     panel.hide();
+    session = null;
   }, true);
   document.addEventListener('mousemove', () => {
     isSelecting = true;
