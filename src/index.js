@@ -18,9 +18,8 @@ function getPlayer(url) {
   };
 }
 
-function render(results, { event, panel, source }) {
+function render(results, { event, panel }) {
   panel.clear();
-  panel.append(<section className={styles.source}>{source}</section>);
   for (const [name, result] of Object.entries(results)) {
     const {
       query, phonetic, detailUrl, explains, translations,
