@@ -171,7 +171,11 @@ function debounce(func, delay) {
 
 function initialize() {
   const panel = VM.getPanel({ css: stylesheet, shadow: false });
-  panel.body.style.padding = '0 8px';
+  const panelStyle = panel.body.style;
+  panelStyle.maxHeight = '50vh';
+  panelStyle.padding = '0 8px';
+  panelStyle.overflow = 'auto';
+  panelStyle.overscrollBehavior = 'contain';
   const debouncedTranslate = debounce(event => translate({ event, panel }));
   let isSelecting;
   document.addEventListener('mousedown', (e) => {
