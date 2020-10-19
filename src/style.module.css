@@ -11,12 +11,6 @@
     }
   }
 
-  .source {
-    padding: 8px 0;
-    font-size: 12px;
-    line-height: 1.2;
-    color: #999;
-  }
   .section {
     display: flex;
     align-items: flex-start;

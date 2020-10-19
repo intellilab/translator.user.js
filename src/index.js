@@ -18,9 +18,8 @@ function getPlayer(url) {
   };
 }
 
-function render(results, { event, panel, source }) {
+function render(results, { event, panel }) {
   panel.clear();
-  panel.append(<section className={styles.source}>{source}</section>);
   for (const [name, result] of Object.entries(results)) {
     const {
       query, phonetic, detailUrl, explains, translations,
@@ -172,7 +171,11 @@ function debounce(func, delay) {
 
 function initialize() {
   const panel = VM.getPanel({ css: stylesheet, shadow: false });
-  panel.body.style.padding = '0 8px';
+  const panelStyle = panel.body.style;
+  panelStyle.maxHeight = '50vh';
+  panelStyle.padding = '0 8px';
+  panelStyle.overflow = 'auto';
+  panelStyle.overscrollBehavior = 'contain';
   const debouncedTranslate = debounce(event => translate({ event, panel }));
   let isSelecting;
   document.addEventListener('mousedown', (e) => {
