@@ -3,7 +3,7 @@
 // @namespace https://lufei.so
 // @supportURL https://github.com/intellilab/translator.user.js
 // @description 划词翻译
-// @version 1.6.5
+// @version 1.6.6
 // @run-at document-start
 // @grant GM_addStyle
 // @grant GM_getValue
@@ -49,6 +49,45 @@ function request({
     });
   });
 }
+
+const LANG_EN = 'en';
+const LANG_ZH_HANS = 'zh-Hans';
+
+async function translate(text, to) {
+  const [data] = await request({
+    method: 'POST',
+    url: 'https://cn.bing.com/ttranslatev3',
+    responseType: 'json',
+    data: dumpQuery({
+      fromLang: 'auto-detect',
+      to,
+      text
+    }),
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  });
+  const {
+    detectedLanguage,
+    translations
+  } = data;
+  return {
+    language: {
+      from: detectedLanguage.language,
+      to
+    },
+    translations: translations.map(item => item.text)
+  };
+}
+
+const provider = {
+  name: 'bing',
+  handle: async source => {
+    let data = await translate(source, LANG_ZH_HANS);
+    if (data.language.from === LANG_ZH_HANS) data = await translate(source, LANG_EN);
+    return data;
+  }
+};
 
 const TKK_KEY = 'google:tkk';
 /* eslint-disable */
@@ -131,30 +170,52 @@ async function getTk(text) {
   const tk = sM(text);
   return tk.slice(4);
 }
-const provider = {
+
+const LANG_EN$1 = 'en';
+const LANG_ZH_CN = 'zh-CN';
+
+async function translate$1(text, to) {
+  var _data$;
+
+  const tk = await getTk(text);
+  const data = await request({
+    url: 'https://translate.google.cn/translate_a/single',
+    params: {
+      q: text,
+      client: 'webapp',
+      sl: 'auto',
+      tl: to,
+      dt: 'at',
+      tk
+    },
+    responseType: 'json'
+  });
+  const language = {
+    from: data[8][0][0],
+    to
+  };
+  const translations = (_data$ = data[5]) == null ? void 0 : _data$.map(item => {
+    var _item$, _item$$;
+
+    return (_item$ = item[2]) == null ? void 0 : (_item$$ = _item$[0]) == null ? void 0 : _item$$[0];
+  }).filter(Boolean);
+  return {
+    language,
+    translations
+  };
+}
+
+const provider$1 = {
   name: 'google',
   handle: async source => {
-    const tk = await getTk(source);
-    const data = await request({
-      url: 'https://translate.google.cn/translate_a/single',
-      params: {
-        q: source,
-        client: 'webapp',
-        sl: 'auto',
-        tl: 'zh-CN',
-        dt: 'at',
-        tk
-      },
-      responseType: 'json'
-    });
-    return {
-      translations: data[5][0][2].map(([text]) => text)
-    };
+    let data = await translate$1(source, LANG_ZH_CN);
+    if (data.language.from === LANG_ZH_CN) data = await translate$1(source, LANG_EN$1);
+    return data;
   }
 };
 
-var styles = {"source":"style-module_source___l1yG","section":"style-module_section__1Eiq1","label":"style-module_label__JD9KX","content":"style-module_content__1MvKK","phonetic":"style-module_phonetic__2SIsx"};
-var stylesheet=":host a{all:initial;color:#7cbef0;cursor:pointer;font-family:inherit;font-size:inherit;line-height:inherit}:host a:hover{text-decoration:underline}:host .style-module_source___l1yG{padding:8px 0;font-size:12px;line-height:1.2;color:#999}:host .style-module_section__1Eiq1{display:flex;align-items:flex-start;font-size:12px;line-height:1.2}:host .style-module_section__1Eiq1:not(:first-child){border-top:1px solid #eee}:host .style-module_label__JD9KX{display:block;margin:8px 8px 8px 0;padding:2px 0;color:#fff;background:#bbb;border-radius:4px;font-size:12px;line-height:1.4;text-transform:uppercase;writing-mode:vertical-rl}:host .style-module_content__1MvKK{flex:1;min-width:0;padding:8px 0}:host .style-module_content__1MvKK>*{display:block}:host .style-module_content__1MvKK>:not(:first-child){margin-top:8px}:host .style-module_phonetic__2SIsx{display:inline-block;margin-left:8px}";
+var styles = {"section":"style-module_section__1Eiq1","label":"style-module_label__JD9KX","content":"style-module_content__1MvKK","phonetic":"style-module_phonetic__2SIsx","item":"style-module_item__2QPXK"};
+var stylesheet=":host a{all:initial;color:#7cbef0;cursor:pointer;font-family:inherit;font-size:inherit;line-height:inherit}:host a:hover{text-decoration:underline}:host .style-module_section__1Eiq1{display:flex;align-items:flex-start;font-size:12px;line-height:1.2}:host .style-module_section__1Eiq1:not(:first-child){border-top:1px solid #eee}:host .style-module_label__JD9KX{display:block;margin:8px 8px 8px 0;padding:2px 0;color:#fff;background:#bbb;border-radius:4px;font-size:12px;line-height:1.4;text-transform:uppercase;writing-mode:vertical-rl}:host .style-module_content__1MvKK{flex:1;min-width:0;padding:8px 0}:host .style-module_content__1MvKK>*{display:block}:host .style-module_content__1MvKK>:not(:first-child){margin-top:8px}:host .style-module_phonetic__2SIsx{display:inline-block;margin-left:8px}:host .style-module_item__2QPXK~.style-module_item__2QPXK{margin-top:8px}";
 
 const React = VM;
 let audio;
@@ -175,13 +236,9 @@ function getPlayer(url) {
 
 function render(results, {
   event,
-  panel,
-  source
+  panel
 }) {
   panel.clear();
-  panel.append( /*#__PURE__*/React.createElement("section", {
-    className: styles.source
-  }, source));
 
   for (const [name, result] of Object.entries(results)) {
     const {
@@ -207,6 +264,7 @@ function render(results, {
       },
       onClick: getPlayer(url)
     }))), explains && /*#__PURE__*/React.createElement("div", null, explains.map(item => /*#__PURE__*/React.createElement("div", {
+      className: styles.item,
       dangerouslySetInnerHTML: {
         __html: item
       }
@@ -215,6 +273,7 @@ function render(results, {
       rel: "noopener noreferrer",
       href: detailUrl
     }, "\u66F4\u591A...")), translations && /*#__PURE__*/React.createElement("div", null, translations.map(item => /*#__PURE__*/React.createElement("div", {
+      className: styles.item,
       dangerouslySetInnerHTML: {
         __html: item
       }
@@ -305,32 +364,10 @@ const providers = [{
       };
     }
   }
-}, {
-  name: 'bing',
-  handle: async source => {
-    const [data] = await request({
-      method: 'POST',
-      url: 'https://cn.bing.com/ttranslatev3',
-      responseType: 'json',
-      data: dumpQuery({
-        fromLang: 'auto-detect',
-        to: 'zh-Hans',
-        text: source
-      }),
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    });
-    return {
-      translations: data.translations.map(({
-        text
-      }) => text)
-    };
-  }
-}, provider];
+}, provider, provider$1];
 let session;
 
-function translate(context) {
+function translate$2(context) {
   const sel = window.getSelection();
   const text = sel.toString().trim();
   if (/^\s*$/.test(text)) return;
@@ -368,16 +405,21 @@ function initialize() {
     css: stylesheet,
     shadow: false
   });
-  panel.body.style.padding = '0 8px';
-  const debouncedTranslate = debounce(event => translate({
+  const panelStyle = panel.body.style;
+  panelStyle.maxHeight = '50vh';
+  panelStyle.padding = '0 8px';
+  panelStyle.overflow = 'auto';
+  panelStyle.overscrollBehavior = 'contain';
+  const debouncedTranslate = debounce(event => translate$2({
     event,
     panel
   }));
   let isSelecting;
   document.addEventListener('mousedown', e => {
     isSelecting = false;
-    if (e.target === panel.host) return;
+    if (panel.body.contains(e.target)) return;
     panel.hide();
+    session = null;
   }, true);
   document.addEventListener('mousemove', () => {
     isSelecting = true;
