@@ -101,7 +101,7 @@ async function translate(text, to) {
     responseType: 'json',
   });
   const language = { from: data[8][0][0], to };
-  const translations = data[5]?.[0]?.[2]?.map(([value]) => value);
+  const translations = data[5]?.map(item => item[2]?.[0]?.[0]).filter(Boolean);
   return { language, translations };
 }
 
