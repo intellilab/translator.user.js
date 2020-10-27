@@ -23,6 +23,7 @@ const rollupConfig = [
       plugins: getRollupPlugins({
         esm: true,
         postcss: postcssOptions,
+        minimize: false,
       }),
     },
     output: {
