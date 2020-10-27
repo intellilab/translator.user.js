@@ -31,6 +31,8 @@
     "husky": "^4.3.0"
   },
   "dependencies": {
-    "@babel/runtime": "^7.12.1"
+    "@babel/runtime": "^7.12.1",
+    "@violentmonkey/dom": "^1.0.9",
+    "@violentmonkey/ui": "^0.4.0"
   }
 }
