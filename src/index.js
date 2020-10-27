@@ -12,10 +12,15 @@ function play(url) {
 }
 
 function getPlayer(url) {
-  return e => {
-    e.preventDefault();
+  return () => {
     play(url);
   };
+}
+
+function handleOpenUrl(e) {
+  const { href } = e.target.dataset;
+  const a = <a href={href} target="_blank" rel="noopener noreferrer" />;
+  a.click();
 }
 
 function render(results, { event, panel }) {
@@ -25,38 +30,44 @@ function render(results, { event, panel }) {
       query, phonetic, detailUrl, explains, translations,
     } = result;
     panel.append((
-      <section className={styles.section}>
-        <div className={styles.label}>{name}</div>
-        <div className={styles.content}>
+      <panel.id className={styles.section}>
+        <panel.id className={styles.label}>{name}</panel.id>
+        <panel.id className={styles.content}>
           {!!(query || phonetic?.length) && (
-            <div>
-              {query && <span>{query}</span>}
+            <panel.id className={styles.block}>
+              {query && <panel.id>{query}</panel.id>}
               {phonetic?.map(({ html, url }) => (
-                <a
-                  className={styles.phonetic}
+                <panel.id
+                  className={`${styles.phonetic} ${styles.link}`}
                   dangerouslySetInnerHTML={{ __html: html }}
                   onClick={getPlayer(url)}
                 />
               ))}
-            </div>
+            </panel.id>
           )}
           {explains && (
-            <div>
+            <panel.id className={styles.block}>
               {explains.map(item => (
-                <div className={styles.item} dangerouslySetInnerHTML={{ __html: item }} />
+                <panel.id className={styles.item} dangerouslySetInnerHTML={{ __html: item }} />
               ))}
-            </div>
+            </panel.id>
           )}
-          {detailUrl && <div><a target="_blank" rel="noopener noreferrer" href={detailUrl}>更多...</a></div>}
+          {detailUrl && (
+            <panel.id className={styles.block}>
+              <panel.id className={styles.link} data-href={detailUrl} onClick={handleOpenUrl}>
+                更多...
+              </panel.id>
+            </panel.id>
+          )}
           {translations && (
-            <div>
+            <panel.id className={styles.block}>
               {translations.map(item => (
-                <div className={styles.item} dangerouslySetInnerHTML={{ __html: item }} />
+                <panel.id className={styles.item} dangerouslySetInnerHTML={{ __html: item }} />
               ))}
-            </div>
+            </panel.id>
           )}
-        </div>
-      </section>
+        </panel.id>
+      </panel.id>
     ));
   }
   const { wrapper } = panel;

@@ -1,11 +1,8 @@
 :host {
-  a {
-    all: initial;
+  .link {
+    position: relative;
     color: #7cbef0;
     cursor: pointer;
-    font-family: inherit;
-    font-size: inherit;
-    line-height: inherit;
     &:hover {
       text-decoration: underline;
     }
@@ -19,6 +16,9 @@
     &:not(:first-child) {
       border-top: 1px solid #eee;
     }
+  }
+  .block {
+    display: block;
   }
   .label {
     display: block;
@@ -49,7 +49,10 @@
     margin-left: 8px;
   }
 
-  .item ~ .item {
-    margin-top: 8px;
+  .item {
+    display: block;
+    ~ .item {
+      margin-top: 8px;
+    }
   }
 }
