@@ -1,4 +1,4 @@
-import { request } from './util';
+import { request } from '../util';
 
 const TKK_KEY = 'google:tkk';
 
@@ -77,39 +77,8 @@ async function updateTKK() {
   GM_setValue(TKK_KEY, tkk);
 }
 
-async function getTk(text) {
+export async function getTk(text) {
   await updateTKK();
   const tk = sM(text);
   return tk.slice(4);
 }
-
-const LANG_EN = 'en';
-const LANG_ZH_CN = 'zh-CN';
-
-async function translate(text, to) {
-  const tk = await getTk(text);
-  const data = await request({
-    url: 'https://translate.google.cn/translate_a/single',
-    params: {
-      q: text,
-      client: 'webapp',
-      sl: 'auto',
-      tl: to,
-      dt: 'at',
-      tk,
-    },
-    responseType: 'json',
-  });
-  const language = { from: data[8][0][0], to };
-  const translations = data[5]?.map(item => item[2]?.[0]?.[0]).filter(Boolean);
-  return { language, translations };
-}
-
-export const provider = {
-  name: 'google',
-  handle: async (source) => {
-    let data = await translate(source, LANG_ZH_CN);
-    if (data.language.from === LANG_ZH_CN) data = await translate(source, LANG_EN);
-    return data;
-  },
-};
