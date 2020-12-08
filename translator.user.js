@@ -3,7 +3,7 @@
 // @namespace https://lufei.so
 // @supportURL https://github.com/intellilab/translator.user.js
 // @description 划词翻译
-// @version 1.6.7
+// @version 1.6.8
 // @run-at document-start
 // @grant GM_addStyle
 // @grant GM_getValue
@@ -50,6 +50,61 @@ function request({
   });
 }
 
+const provider = {
+  name: 'youdao',
+  handle: async text => {
+    const payload = {
+      type: 'data',
+      doctype: 'json',
+      version: '1.1',
+      relatedUrl: 'http://fanyi.youdao.com/',
+      keyfrom: 'fanyiweb',
+      key: null,
+      translate: 'on',
+      q: text,
+      ts: Date.now()
+    };
+    const result = await request({
+      url: 'https://fanyi.youdao.com/openapi.do',
+      params: payload,
+      responseType: 'json'
+    });
+    if (result.errorCode) throw result;
+    const {
+      basic,
+      query,
+      translation
+    } = result;
+
+    if (basic) {
+      const noPhonetic = '&hearts;';
+      const {
+        explains,
+        'us-phonetic': us,
+        'uk-phonetic': uk
+      } = basic;
+      return {
+        query,
+        phonetic: [{
+          html: `UK: [${uk || noPhonetic}]`,
+          url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=1`
+        }, {
+          html: `US: [${us || noPhonetic}]`,
+          url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=2`
+        }],
+        explains,
+        detailUrl: `http://dict.youdao.com/search?q=${encodeURIComponent(query)}`
+      };
+    }
+
+    if (translation != null && translation[0]) {
+      return {
+        translations: translation
+      };
+    }
+  }
+};
+
 const LANG_EN = 'en';
 const LANG_ZH_HANS = 'zh-Hans';
 
@@ -80,7 +135,7 @@ async function translate(text, to) {
   };
 }
 
-const provider = {
+const provider$1 = {
   name: 'bing',
   handle: async source => {
     let data = await translate(source, LANG_ZH_HANS);
@@ -89,104 +144,20 @@ const provider = {
   }
 };
 
-const TKK_KEY = 'google:tkk';
-/* eslint-disable */
-// Reference: https://github.com/matheuss/google-translate-token
-
-function sM(a) {
-  var b;
-  if (null !== yr) b = yr;else {
-    b = wr(String.fromCharCode(84));
-    var c = wr(String.fromCharCode(75));
-    b = [b(), b()];
-    b[1] = c();
-    b = (yr = window$1[b.join(c())] || "") || "";
-  }
-  var d = wr(String.fromCharCode(116)),
-      c = wr(String.fromCharCode(107)),
-      d = [d(), d()];
-  d[1] = c();
-  c = "&" + d.join("") + "=";
-  d = b.split(".");
-  b = Number(d[0]) || 0;
-
-  for (var e = [], f = 0, g = 0; g < a.length; g++) {
-    var l = a.charCodeAt(g);
-    128 > l ? e[f++] = l : (2048 > l ? e[f++] = l >> 6 | 192 : (55296 == (l & 64512) && g + 1 < a.length && 56320 == (a.charCodeAt(g + 1) & 64512) ? (l = 65536 + ((l & 1023) << 10) + (a.charCodeAt(++g) & 1023), e[f++] = l >> 18 | 240, e[f++] = l >> 12 & 63 | 128) : e[f++] = l >> 12 | 224, e[f++] = l >> 6 & 63 | 128), e[f++] = l & 63 | 128);
-  }
-
-  a = b;
-
-  for (f = 0; f < e.length; f++) a += e[f], a = xr(a, "+-a^+6");
-
-  a = xr(a, "+-3^+b+-f");
-  a ^= Number(d[1]) || 0;
-  0 > a && (a = (a & 2147483647) + 2147483648);
-  a %= 1E6;
-  return c + (a.toString() + "." + (a ^ b));
-}
-
-var yr = null;
-
-var wr = function (a) {
-  return function () {
-    return a;
-  };
-},
-    xr = function (a, b) {
-  for (var c = 0; c < b.length - 2; c += 3) {
-    var d = b.charAt(c + 2),
-        d = "a" <= d ? d.charCodeAt(0) - 87 : Number(d),
-        d = "+" == b.charAt(c + 1) ? a >>> d : a << d;
-    a = "+" == b.charAt(c) ? a + d & 4294967295 : a ^ d;
-  }
-
-  return a;
-};
-/* eslint-enable */
-
-
-const window$1 = {
-  TKK: GM_getValue(TKK_KEY) || '0'
-};
-
-async function updateTKK() {
-  const now = Math.floor(Date.now() / 3600000);
-
-  if (Number(window$1.TKK.split('.')[0]) === now) {
-    return;
-  }
-
-  const text = await request({
-    url: 'https://translate.google.cn'
-  });
-  const tkk = text.match(/tkk:'([^']+)'/)[1];
-  window$1.TKK = tkk;
-  GM_setValue(TKK_KEY, tkk);
-}
-
-async function getTk(text) {
-  await updateTKK();
-  const tk = sM(text);
-  return tk.slice(4);
-}
-
 const LANG_EN$1 = 'en';
 const LANG_ZH_CN = 'zh-CN';
 
 async function translate$1(text, to) {
   var _data$;
 
-  const tk = await getTk(text);
   const data = await request({
     url: 'https://translate.google.cn/translate_a/single',
     params: {
       q: text,
-      client: 'webapp',
+      client: 'gtx',
       sl: 'auto',
       tl: to,
-      dt: 'at',
-      tk
+      dt: 'at'
     },
     responseType: 'json'
   });
@@ -205,7 +176,7 @@ async function translate$1(text, to) {
   };
 }
 
-const provider$1 = {
+const provider$2 = {
   name: 'google',
   handle: async source => {
     let data = await translate$1(source, LANG_ZH_CN);
@@ -265,7 +236,7 @@ function render(results, {
       className: styles.label
     }, name), /*#__PURE__*/React.createElement(panel.id, {
       className: styles.content
-    }, !!(query || (phonetic == null ? void 0 : phonetic.length)) && /*#__PURE__*/React.createElement(panel.id, {
+    }, !!(query || phonetic != null && phonetic.length) && /*#__PURE__*/React.createElement(panel.id, {
       className: styles.block
     }, query && /*#__PURE__*/React.createElement(panel.id, null, query), phonetic == null ? void 0 : phonetic.map(({
       html,
@@ -330,60 +301,7 @@ function render(results, {
   panel.show();
 }
 
-const providers = [{
-  name: 'youdao',
-  handle: async text => {
-    const payload = {
-      type: 'data',
-      doctype: 'json',
-      version: '1.1',
-      relatedUrl: 'http://fanyi.youdao.com/',
-      keyfrom: 'fanyiweb',
-      key: null,
-      translate: 'on',
-      q: text,
-      ts: Date.now()
-    };
-    const result = await request({
-      url: 'https://fanyi.youdao.com/openapi.do',
-      params: payload,
-      responseType: 'json'
-    });
-    if (result.errorCode) throw result;
-    const {
-      basic,
-      query,
-      translation
-    } = result;
-
-    if (basic) {
-      const noPhonetic = '&hearts;';
-      const {
-        explains,
-        'us-phonetic': us,
-        'uk-phonetic': uk
-      } = basic;
-      return {
-        query,
-        phonetic: [{
-          html: `UK: [${uk || noPhonetic}]`,
-          url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=1`
-        }, {
-          html: `US: [${us || noPhonetic}]`,
-          url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=2`
-        }],
-        explains,
-        detailUrl: `http://dict.youdao.com/search?q=${encodeURIComponent(query)}`
-      };
-    }
-
-    if (translation == null ? void 0 : translation[0]) {
-      return {
-        translations: translation
-      };
-    }
-  }
-}, provider, provider$1];
+const providers = [provider, provider$1, provider$2];
 let session;
 
 function translate$2(context) {
