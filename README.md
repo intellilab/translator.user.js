@@ -1,8 +1,10 @@
 # translator.user.js
 
-划词翻译，基于有道云词典。
+划词翻译，支持多个数据源：
 
-[@JetLua](https://github.com/JetLua) 说它简洁、强大，然而 [@gera2ld](https://github.com/gera2ld) 并不这么认为。
+- 有道翻译
+- Bing 翻译
+- Google 翻译
 
 ## 安装依赖
 
@@ -28,9 +30,6 @@ $ yarn build
 ``` sh
 # 升级新版本
 $ yarn version --patch
-
-# 编译
-$ yarn build
 ```
 
-然后发布 `dist/translator.user.js`。
+然后通过 GitHub Action 自动发布。
