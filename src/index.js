@@ -96,17 +96,22 @@ const providers = [
   googleProvider,
 ];
 
+function getSelectionText() {
+  const { activeElement } = document;
+  let text;
+  if (['input', 'textarea'].includes(activeElement.tagName.toLowerCase())) {
+    text = activeElement.value.slice(activeElement.selectionStart, activeElement.selectionEnd);
+  } else {
+    const sel = window.getSelection();
+    text = sel.toString();
+  }
+  return text.trim();
+}
+
 let session;
 function translate(context) {
-  const sel = window.getSelection();
-  const text = sel.toString().trim();
+  const text = getSelectionText();
   if (/^\s*$/.test(text)) return;
-  const { activeElement } = document;
-  if (
-    ['input', 'textarea'].indexOf(activeElement.tagName.toLowerCase()) < 0
-    && !activeElement.contains(sel.getRangeAt(0).startContainer)
-  ) return;
-
   context.source = text;
   const results = {};
   session = results;
