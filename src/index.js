@@ -3,8 +3,20 @@ import { provider as bingProvider } from './bing';
 import { provider as googleProvider } from './google';
 import styles, { stylesheet } from './style.module.css';
 
+GM_addStyle(stylesheet);
 const React = VM;
 let audio;
+let mouse;
+let query;
+let startTime = 0;
+let translated = false;
+
+const panel = VM.getPanel({ shadow: false });
+const button = VM.getHostElement(false);
+button.root.className = styles.buttonRoot;
+button.root.append((
+  <div className={styles.button} onMouseOver={handlePrepare} onMouseOut={handleCancel}>查</div>
+));
 
 function play(url) {
   if (!audio) audio = <audio autoPlay />;
@@ -23,19 +35,50 @@ function handleOpenUrl(e) {
   a.click();
 }
 
-function render(results, { event, panel }) {
+function handleRotate() {
+  if (!startTime) return;
+  requestAnimationFrame(handleRotate);
+  const t = (Date.now() - startTime) / 1000;
+  const v0 = 180;
+  const a = 720;
+  const d = v0 * t + 0.5 * a * t * t;
+  button.root.style.transform = `rotate(${d % 360}deg)`;
+  if (!translated && t > 0.8) {
+    translate();
+    translated = true;
+    setTimeout(() => {
+      handleCancel();
+      button.hide();
+      translated = false;
+    }, 200);
+  }
+}
+
+function handlePrepare() {
+  if (!startTime) {
+    startTime = Date.now();
+    handleRotate();
+  }
+}
+
+function handleCancel() {
+  startTime = 0;
+  button.root.style.transform = 'none';
+}
+
+function render(results) {
   panel.clear();
   for (const [name, result] of Object.entries(results)) {
     const {
-      query, phonetic, detailUrl, explains, translations,
+      query: q, phonetic, detailUrl, explains, translations,
     } = result;
     panel.append((
       <panel.id className={styles.section}>
         <panel.id className={styles.label}>{name}</panel.id>
         <panel.id className={styles.content}>
-          {!!(query || phonetic?.length) && (
+          {!!(q || phonetic?.length) && (
             <panel.id className={styles.block}>
-              {query && <panel.id>{query}</panel.id>}
+              {q && <panel.id>{q}</panel.id>}
               {phonetic?.map(({ html, url }) => (
                 <panel.id
                   className={`${styles.phonetic} ${styles.link}`}
@@ -71,23 +114,29 @@ function render(results, { event, panel }) {
     ));
   }
   const { wrapper } = panel;
+  Object.assign(wrapper.style, getPosition());
+  panel.show();
+}
+
+function getPosition() {
   const { innerWidth, innerHeight } = window;
-  const { clientX, clientY } = event;
+  const { clientX, clientY } = mouse;
+  const style = {};
   if (clientY > innerHeight * 0.5) {
-    wrapper.style.top = 'auto';
-    wrapper.style.bottom = `${innerHeight - clientY + 10}px`;
+    style.top = 'auto';
+    style.bottom = `${innerHeight - clientY + 10}px`;
   } else {
-    wrapper.style.top = `${clientY + 10}px`;
-    wrapper.style.bottom = 'auto';
+    style.top = `${clientY + 10}px`;
+    style.bottom = 'auto';
   }
   if (clientX > innerWidth * 0.5) {
-    wrapper.style.left = 'auto';
-    wrapper.style.right = `${innerWidth - clientX}px`;
+    style.left = 'auto';
+    style.right = `${innerWidth - clientX}px`;
   } else {
-    wrapper.style.left = `${clientX}px`;
-    wrapper.style.right = 'auto';
+    style.left = `${clientX}px`;
+    style.right = 'auto';
   }
-  panel.show();
+  return style;
 }
 
 const providers = [
@@ -109,17 +158,14 @@ function getSelectionText() {
 }
 
 let session;
-function translate(context) {
-  const text = getSelectionText();
-  if (/^\s*$/.test(text)) return;
-  context.source = text;
+function translate() {
   const results = {};
   session = results;
   providers.forEach(async provider => {
-    const result = await provider.handle(text);
+    const result = await provider.handle(query);
     if (!result || session !== results) return;
     results[provider.name] = result;
-    render(results, context);
+    render(results);
   });
 }
 
@@ -136,28 +182,28 @@ function debounce(func, delay) {
 }
 
 function initialize() {
-  const panel = VM.getPanel({ css: stylesheet, shadow: false });
   const panelStyle = panel.body.style;
   panelStyle.maxHeight = '50vh';
   panelStyle.padding = '0 8px';
   panelStyle.overflow = 'auto';
   panelStyle.overscrollBehavior = 'contain';
-  const debouncedTranslate = debounce(event => translate({ event, panel }));
-  let isSelecting;
+  const debouncedTranslate = debounce(event => {
+    mouse = {
+      clientX: event.clientX,
+      clientY: event.clientY,
+    };
+    query = getSelectionText();
+    if (/^\s*$/.test(query)) return;
+    Object.assign(button.root.style, getPosition());
+    button.show();
+  });
   document.addEventListener('mousedown', (e) => {
-    isSelecting = false;
     if (panel.body.contains(e.target)) return;
     panel.hide();
+    button.hide();
     session = null;
   }, true);
-  document.addEventListener('mousemove', () => {
-    isSelecting = true;
-  }, true);
   document.addEventListener('mouseup', (e) => {
-    if (panel.body.contains(e.target) || !isSelecting) return;
-    debouncedTranslate(e);
-  }, true);
-  document.addEventListener('dblclick', (e) => {
     if (panel.body.contains(e.target)) return;
     debouncedTranslate(e);
   }, true);

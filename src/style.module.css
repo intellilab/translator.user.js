@@ -1,58 +1,72 @@
-:host {
-  .link {
-    position: relative;
-    color: #7cbef0;
-    cursor: pointer;
-    &:hover {
-      text-decoration: underline;
-    }
+.link {
+  position: relative;
+  color: #7cbef0;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
   }
+}
 
-  .section {
-    display: flex;
-    align-items: flex-start;
-    font-size: 12px;
-    line-height: 1.2;
+.section {
+  display: flex;
+  align-items: flex-start;
+  font-size: 12px;
+  line-height: 1.2;
+  &:not(:first-child) {
+    border-top: 1px solid #eee;
+  }
+}
+.block {
+  display: block;
+}
+.label {
+  display: block;
+  margin: 8px 8px 8px 0;
+  padding: 2px 0;
+  color: white;
+  background: #bbb;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+}
+.content {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 0;
+  > * {
+    display: block;
     &:not(:first-child) {
-      border-top: 1px solid #eee;
-    }
-  }
-  .block {
-    display: block;
-  }
-  .label {
-    display: block;
-    margin: 8px 8px 8px 0;
-    padding: 2px 0;
-    color: white;
-    background: #bbb;
-    border-radius: 4px;
-    font-size: 12px;
-    line-height: 1.4;
-    text-transform: uppercase;
-    writing-mode: vertical-rl;
-  }
-  .content {
-    flex: 1;
-    min-width: 0;
-    padding: 8px 0;
-    > * {
-      display: block;
-      &:not(:first-child) {
-        margin-top: 8px;
-      }
-    }
-  }
-
-  .phonetic {
-    display: inline-block;
-    margin-left: 8px;
-  }
-
-  .item {
-    display: block;
-    ~ .item {
       margin-top: 8px;
     }
   }
+}
+
+.phonetic {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.item {
+  display: block;
+  ~ .item {
+    margin-top: 8px;
+  }
+}
+
+.buttonRoot {
+  position: absolute;
+  text-align: center;
+}
+
+.button {
+  display: block;
+  box-sizing: content-box;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  background: #ffee88;
+  border: 1px solid #888;
+  border-radius: 50%;
 }
