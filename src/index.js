@@ -8,8 +8,7 @@ const React = VM;
 let audio;
 let mouse;
 let query;
-let startTime = 0;
-let translated = false;
+let hoverTimer;
 
 const panel = VM.getPanel({ shadow: false });
 const button = VM.getHostElement(false);
@@ -35,35 +34,23 @@ function handleOpenUrl(e) {
   a.click();
 }
 
-function handleRotate() {
-  if (!startTime) return;
-  requestAnimationFrame(handleRotate);
-  const t = (Date.now() - startTime) / 1000;
-  const v0 = 180;
-  const a = 720;
-  const d = v0 * t + 0.5 * a * t * t;
-  button.root.style.transform = `rotate(${d % 360}deg)`;
-  if (!translated && t > 0.8) {
-    translate();
-    translated = true;
-    setTimeout(() => {
-      handleCancel();
-      button.hide();
-      translated = false;
-    }, 200);
-  }
+function handleTranslate() {
+  hoverTimer = null;
+  button.hide();
+  translate();
 }
 
 function handlePrepare() {
-  if (!startTime) {
-    startTime = Date.now();
-    handleRotate();
+  if (!hoverTimer) {
+    hoverTimer = setTimeout(handleTranslate, 800);
   }
 }
 
 function handleCancel() {
-  startTime = 0;
-  button.root.style.transform = 'none';
+  if (hoverTimer) {
+    clearTimeout(hoverTimer);
+    hoverTimer = null;
+  }
 }
 
 function render(results) {

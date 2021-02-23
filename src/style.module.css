@@ -56,8 +56,9 @@
 }
 
 .buttonRoot {
-  position: absolute;
+  position: fixed;
   text-align: center;
+  z-index: 10000;
 }
 
 .button {
@@ -69,4 +70,19 @@
   background: #ffee88;
   border: 1px solid #888;
   border-radius: 50%;
+  &:hover {
+    animation-duration: .5s;
+    animation-name: rotate;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
