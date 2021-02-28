@@ -14,7 +14,7 @@ const panel = VM.getPanel({ shadow: false });
 const button = VM.getHostElement(false);
 button.root.className = styles.buttonRoot;
 button.root.append((
-  <div className={styles.button} onMouseOver={handlePrepare} onMouseOut={handleCancel}>查</div>
+  <div className={styles.button} onMouseOver={handlePrepare} onMouseOut={handleCancel} />
 ));
 
 function play(url) {
