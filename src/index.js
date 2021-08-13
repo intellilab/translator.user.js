@@ -55,6 +55,9 @@ function handleCancel() {
   }
 }
 
+/**
+ * @param { import('./types').TranslatorResponse[] } results
+ */
 function render(results) {
   panel.clear();
   for (const [name, result] of Object.entries(results)) {
@@ -128,6 +131,9 @@ function getPosition() {
   return style;
 }
 
+/**
+ * @type import('./types').TranslatorProvider[]
+ */
 const providers = [
   youdaoProvider,
   bingProvider,
@@ -148,6 +154,9 @@ function getSelectionText() {
 
 let session;
 function translate() {
+  /**
+   * @type { [key: string]: import('./types').TranslatorResponse }
+   */
   const results = {};
   session = results;
   providers.forEach(async provider => {
