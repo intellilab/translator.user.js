@@ -8,6 +8,9 @@ module.exports = {
     'import/resolver': {
       'babel-module': {},
     },
+    react: {
+      pragma: 'VM',
+    },
   },
   globals: {
     VM: true,

@@ -3,7 +3,6 @@ import { provider as bingProvider } from './bing';
 import { provider as googleProvider } from './google';
 import styles, { stylesheet } from './style.module.css';
 
-const React = VM;
 let audio;
 let mouse;
 let query;

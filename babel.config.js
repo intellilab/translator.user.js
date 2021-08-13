@@ -4,6 +4,9 @@ module.exports = {
   ],
   plugins: [
     // JSX
-    '@babel/plugin-transform-react-jsx',
+    ['@babel/plugin-transform-react-jsx', {
+      pragma: 'VM.createElement',
+      pragmaFrag: 'VM.Fragment',
+    }],
   ].filter(Boolean),
 };
