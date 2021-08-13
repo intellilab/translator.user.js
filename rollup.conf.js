@@ -15,6 +15,9 @@ const postcssOptions = {
   ...require('@gera2ld/plaid/config/postcssrc'),
   inject: false,
   minimize: true,
+  modules: {
+    generateScopedName: "tr_[local]_[hash:base64:5]",
+  },
 };
 const rollupConfig = [
   {

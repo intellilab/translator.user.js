@@ -20,8 +20,11 @@ async function translate(text, to) {
   return { language, translations };
 }
 
+/**
+ * @type import('../types').TranslatorProvider
+ */
 export const provider = {
-  name: 'google',
+  name: 'Google 翻译',
   handle: async (source) => {
     let data = await translate(source, LANG_ZH_CN);
     if (data.language.from === LANG_ZH_CN) data = await translate(source, LANG_EN);

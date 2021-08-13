@@ -1,7 +1,10 @@
 import { request } from './util';
 
+/**
+ * @type import('./types').TranslatorProvider
+ */
 export const provider = {
-  name: 'youdao',
+  name: '有道翻译',
   handle: async (text) => {
     const payload = {
       type: 'data',
