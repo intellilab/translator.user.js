@@ -3,7 +3,6 @@ import { provider as bingProvider } from './bing';
 import { provider as googleProvider } from './google';
 import styles, { stylesheet } from './style.module.css';
 
-GM_addStyle(stylesheet);
 const React = VM;
 let audio;
 let mouse;
@@ -16,6 +15,9 @@ button.root.className = styles.buttonRoot;
 button.root.append((
   <div className={styles.button} onMouseOver={handlePrepare} onMouseOut={handleCancel} />
 ));
+
+// Insert CSS after panel
+GM_addStyle(stylesheet);
 
 function play(url) {
   if (!audio) audio = <audio autoPlay />;
@@ -169,11 +171,7 @@ function debounce(func, delay) {
 }
 
 function initialize() {
-  const panelStyle = panel.body.style;
-  panelStyle.maxHeight = '50vh';
-  panelStyle.padding = '0 8px';
-  panelStyle.overflow = 'auto';
-  panelStyle.overscrollBehavior = 'contain';
+  panel.body.classList.add(styles.panelBody);
   const debouncedTranslate = debounce(event => {
     mouse = {
       clientX: event.clientX,
