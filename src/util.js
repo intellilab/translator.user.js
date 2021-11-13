@@ -1,6 +1,9 @@
 export function dumpQuery(query) {
   return Object.entries(query)
-    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    )
     .join('&');
 }
 

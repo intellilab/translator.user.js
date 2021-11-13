@@ -8,6 +8,6 @@
 // @grant GM_getValue
 // @grant GM_setValue
 // @grant GM_xmlhttpRequest
-// @require https://cdn.jsdelivr.net/combine/npm/@violentmonkey/dom@1,npm/@violentmonkey/ui@0.6
+// @require https://cdn.jsdelivr.net/combine/npm/@violentmonkey/dom@2,npm/@violentmonkey/ui@0.7
 // @include *
 // ==/UserScript==

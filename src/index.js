@@ -3,6 +3,7 @@ import { provider as bingProvider } from './bing';
 import { provider as googleProvider } from './google';
 import styles, { stylesheet } from './style.module.css';
 
+/** @type HTMLAudioElement */
 let audio;
 let mouse;
 let query;
@@ -10,16 +11,24 @@ let hoverTimer;
 
 const panel = VM.getPanel({ shadow: false });
 const button = VM.getHostElement(false);
-button.root.className = styles.buttonRoot;
-button.root.append((
-  <div className={styles.button} onMouseOver={handlePrepare} onMouseOut={handleCancel} />
-));
+/** @type HTMLElement */
+const { root: buttonEl } = button;
+buttonEl.className = styles.buttonRoot;
+buttonEl.append(
+  VM.m(
+    <div
+      className={styles.button}
+      onMouseOver={handlePrepare}
+      onMouseOut={handleCancel}
+    />
+  )
+);
 
 // Insert CSS after panel
 GM_addStyle(stylesheet);
 
 function play(url) {
-  if (!audio) audio = <audio autoPlay />;
+  if (!audio) audio = VM.m(<audio autoPlay />);
   audio.src = url;
 }
 
@@ -31,7 +40,8 @@ function getPlayer(url) {
 
 function handleOpenUrl(e) {
   const { href } = e.target.dataset;
-  const a = <a href={href} target="_blank" rel="noopener noreferrer" />;
+  /** @type HTMLAnchorElement */
+  const a = VM.m(<a href={href} target="_blank" rel="noopener noreferrer" />);
   a.click();
 }
 
@@ -60,49 +70,59 @@ function handleCancel() {
 function render(results) {
   panel.clear();
   for (const [name, result] of Object.entries(results)) {
-    const {
-      query: q, phonetic, detailUrl, explains, translations,
-    } = result;
-    panel.append((
-      <panel.id className={styles.section}>
-        <panel.id className={styles.label}>{name}</panel.id>
-        <panel.id className={styles.content}>
-          {!!(q || phonetic?.length) && (
-            <panel.id className={styles.block}>
-              {q && <panel.id>{q}</panel.id>}
-              {phonetic?.map(({ html, url }) => (
-                <panel.id
-                  className={`${styles.phonetic} ${styles.link}`}
-                  dangerouslySetInnerHTML={{ __html: html }}
-                  onClick={getPlayer(url)}
-                />
-              ))}
-            </panel.id>
-          )}
-          {explains && (
-            <panel.id className={styles.block}>
-              {explains.map(item => (
-                <panel.id className={styles.item} dangerouslySetInnerHTML={{ __html: item }} />
-              ))}
-            </panel.id>
-          )}
-          {detailUrl && (
-            <panel.id className={styles.block}>
-              <panel.id className={styles.link} data-href={detailUrl} onClick={handleOpenUrl}>
-                更多...
+    const { query: q, phonetic, detailUrl, explains, translations } = result;
+    panel.append(
+      VM.m(
+        <panel.id className={styles.section}>
+          <panel.id className={styles.label}>{name}</panel.id>
+          <panel.id className={styles.content}>
+            {!!(q || phonetic?.length) && (
+              <panel.id className={styles.block}>
+                {q && <panel.id>{q}</panel.id>}
+                {phonetic?.map(({ html, url }) => (
+                  <panel.id
+                    className={`${styles.phonetic} ${styles.link}`}
+                    dangerouslySetInnerHTML={{ __html: html }}
+                    onClick={getPlayer(url)}
+                  />
+                ))}
               </panel.id>
-            </panel.id>
-          )}
-          {translations && (
-            <panel.id className={styles.block}>
-              {translations.map(item => (
-                <panel.id className={styles.item} dangerouslySetInnerHTML={{ __html: item }} />
-              ))}
-            </panel.id>
-          )}
+            )}
+            {explains && (
+              <panel.id className={styles.block}>
+                {explains.map((item) => (
+                  <panel.id
+                    className={styles.item}
+                    dangerouslySetInnerHTML={{ __html: item }}
+                  />
+                ))}
+              </panel.id>
+            )}
+            {detailUrl && (
+              <panel.id className={styles.block}>
+                <panel.id
+                  className={styles.link}
+                  data-href={detailUrl}
+                  onClick={handleOpenUrl}
+                >
+                  更多...
+                </panel.id>
+              </panel.id>
+            )}
+            {translations && (
+              <panel.id className={styles.block}>
+                {translations.map((item) => (
+                  <panel.id
+                    className={styles.item}
+                    dangerouslySetInnerHTML={{ __html: item }}
+                  />
+                ))}
+              </panel.id>
+            )}
+          </panel.id>
         </panel.id>
-      </panel.id>
-    ));
+      )
+    );
   }
   const { wrapper } = panel;
   Object.assign(wrapper.style, getPosition());
@@ -133,17 +153,16 @@ function getPosition() {
 /**
  * @type import('./types').TranslatorProvider[]
  */
-const providers = [
-  youdaoProvider,
-  bingProvider,
-  googleProvider,
-];
+const providers = [youdaoProvider, bingProvider, googleProvider];
 
 function getSelectionText() {
   const { activeElement } = document;
   let text;
   if (['input', 'textarea'].includes(activeElement.tagName.toLowerCase())) {
-    text = activeElement.value.slice(activeElement.selectionStart, activeElement.selectionEnd);
+    text = activeElement.value.slice(
+      activeElement.selectionStart,
+      activeElement.selectionEnd
+    );
   } else {
     const sel = window.getSelection();
     text = sel.toString();
@@ -158,7 +177,7 @@ function translate() {
    */
   const results = {};
   session = results;
-  providers.forEach(async provider => {
+  providers.forEach(async (provider) => {
     const result = await provider.handle(query);
     if (!result || session !== results) return;
     results[provider.name] = result;
@@ -180,26 +199,34 @@ function debounce(func, delay) {
 
 function initialize() {
   panel.body.classList.add(styles.panelBody);
-  const debouncedTranslate = debounce(event => {
+  const debouncedTranslate = debounce((event) => {
     mouse = {
       clientX: event.clientX,
       clientY: event.clientY,
     };
     query = getSelectionText();
     if (/^\s*$/.test(query)) return;
-    Object.assign(button.root.style, getPosition());
+    Object.assign(buttonEl.style, getPosition());
     button.show();
   });
-  document.addEventListener('mousedown', (e) => {
-    if (panel.body.contains(e.target)) return;
-    panel.hide();
-    button.hide();
-    session = null;
-  }, true);
-  document.addEventListener('mouseup', (e) => {
-    if (panel.body.contains(e.target)) return;
-    debouncedTranslate(e);
-  }, true);
+  document.addEventListener(
+    'mousedown',
+    (e) => {
+      if (panel.body.contains(e.target)) return;
+      panel.hide();
+      button.hide();
+      session = null;
+    },
+    true
+  );
+  document.addEventListener(
+    'mouseup',
+    (e) => {
+      if (panel.body.contains(e.target)) return;
+      debouncedTranslate(e);
+    },
+    true
+  );
 }
 
 initialize();

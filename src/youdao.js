@@ -26,25 +26,27 @@ export const provider = {
     const { basic, query, translation } = result;
     if (basic) {
       const noPhonetic = '&hearts;';
-      const {
-        explains,
-        'us-phonetic': us,
-        'uk-phonetic': uk,
-      } = basic;
+      const { explains, 'us-phonetic': us, 'uk-phonetic': uk } = basic;
       return {
         query,
         phonetic: [
           {
             html: `UK: [${uk || noPhonetic}]`,
-            url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=1`,
+            url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(
+              query
+            )}&type=1`,
           },
           {
             html: `US: [${us || noPhonetic}]`,
-            url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(query)}&type=2`,
+            url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(
+              query
+            )}&type=2`,
           },
         ],
         explains,
-        detailUrl: `http://dict.youdao.com/search?q=${encodeURIComponent(query)}`,
+        detailUrl: `http://dict.youdao.com/search?q=${encodeURIComponent(
+          query
+        )}`,
       };
     }
     if (translation?.[0]) {
