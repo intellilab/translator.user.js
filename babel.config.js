@@ -5,7 +5,7 @@ module.exports = {
       '@babel/preset-react',
       {
         runtime: 'classic',
-        pragma: 'VM.h',
+        pragma: 'VM.hm',
         pragmaFrag: 'VM.Fragment',
       },
     ],

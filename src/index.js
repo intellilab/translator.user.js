@@ -12,23 +12,21 @@ let hoverTimer;
 const panel = VM.getPanel({ shadow: false });
 const button = VM.getHostElement(false);
 /** @type HTMLElement */
-const { root: buttonEl } = button;
+const buttonEl = button.root;
 buttonEl.className = styles.buttonRoot;
 buttonEl.append(
-  VM.m(
-    <div
-      className={styles.button}
-      onMouseOver={handlePrepare}
-      onMouseOut={handleCancel}
-    />
-  )
+  <div
+    className={styles.button}
+    onMouseOver={handlePrepare}
+    onMouseOut={handleCancel}
+  />
 );
 
 // Insert CSS after panel
 GM_addStyle(stylesheet);
 
 function play(url) {
-  if (!audio) audio = VM.m(<audio autoPlay />);
+  if (!audio) audio = <audio autoPlay />;
   audio.src = url;
 }
 
@@ -41,7 +39,7 @@ function getPlayer(url) {
 function handleOpenUrl(e) {
   const { href } = e.target.dataset;
   /** @type HTMLAnchorElement */
-  const a = VM.m(<a href={href} target="_blank" rel="noopener noreferrer" />);
+  const a = <a href={href} target="_blank" rel="noopener noreferrer" />;
   a.click();
 }
 
@@ -72,56 +70,54 @@ function render(results) {
   for (const [name, result] of Object.entries(results)) {
     const { query: q, phonetic, detailUrl, explains, translations } = result;
     panel.append(
-      VM.m(
-        <panel.id className={styles.section}>
-          <panel.id className={styles.label}>{name}</panel.id>
-          <panel.id className={styles.content}>
-            {!!(q || phonetic?.length) && (
-              <panel.id className={styles.block}>
-                {q && <panel.id>{q}</panel.id>}
-                {phonetic?.map(({ html, url }) => (
-                  <panel.id
-                    className={`${styles.phonetic} ${styles.link}`}
-                    dangerouslySetInnerHTML={{ __html: html }}
-                    onClick={getPlayer(url)}
-                  />
-                ))}
-              </panel.id>
-            )}
-            {explains && (
-              <panel.id className={styles.block}>
-                {explains.map((item) => (
-                  <panel.id
-                    className={styles.item}
-                    dangerouslySetInnerHTML={{ __html: item }}
-                  />
-                ))}
-              </panel.id>
-            )}
-            {detailUrl && (
-              <panel.id className={styles.block}>
+      <panel.id className={styles.section}>
+        <panel.id className={styles.label}>{name}</panel.id>
+        <panel.id className={styles.content}>
+          {!!(q || phonetic?.length) && (
+            <panel.id className={styles.block}>
+              {q && <panel.id>{q}</panel.id>}
+              {phonetic?.map(({ html, url }) => (
                 <panel.id
-                  className={styles.link}
-                  data-href={detailUrl}
-                  onClick={handleOpenUrl}
-                >
-                  更多...
-                </panel.id>
+                  className={`${styles.phonetic} ${styles.link}`}
+                  dangerouslySetInnerHTML={{ __html: html }}
+                  onClick={getPlayer(url)}
+                />
+              ))}
+            </panel.id>
+          )}
+          {explains && (
+            <panel.id className={styles.block}>
+              {explains.map((item) => (
+                <panel.id
+                  className={styles.item}
+                  dangerouslySetInnerHTML={{ __html: item }}
+                />
+              ))}
+            </panel.id>
+          )}
+          {detailUrl && (
+            <panel.id className={styles.block}>
+              <panel.id
+                className={styles.link}
+                data-href={detailUrl}
+                onClick={handleOpenUrl}
+              >
+                更多...
               </panel.id>
-            )}
-            {translations && (
-              <panel.id className={styles.block}>
-                {translations.map((item) => (
-                  <panel.id
-                    className={styles.item}
-                    dangerouslySetInnerHTML={{ __html: item }}
-                  />
-                ))}
-              </panel.id>
-            )}
-          </panel.id>
+            </panel.id>
+          )}
+          {translations && (
+            <panel.id className={styles.block}>
+              {translations.map((item) => (
+                <panel.id
+                  className={styles.item}
+                  dangerouslySetInnerHTML={{ __html: item }}
+                />
+              ))}
+            </panel.id>
+          )}
         </panel.id>
-      )
+      </panel.id>
     );
   }
   const { wrapper } = panel;
