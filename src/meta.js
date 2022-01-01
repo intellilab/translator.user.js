@@ -4,10 +4,6 @@
 // @supportURL https://github.com/intellilab/translator.user.js
 // @description 划词翻译
 // @version process.env.VERSION
-// @grant GM_addStyle
-// @grant GM_getValue
-// @grant GM_setValue
-// @grant GM_xmlhttpRequest
 // @require https://cdn.jsdelivr.net/combine/npm/@violentmonkey/dom@2,npm/@violentmonkey/ui@0.7
 // @include *
 // ==/UserScript==

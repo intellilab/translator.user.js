@@ -2,8 +2,10 @@ module.exports = {
   root: true,
   extends: [
     require.resolve('@gera2ld/plaid/eslint'),
-    'plugin:prettier/recommended',
   ],
+  env: {
+    es2021: true,
+  },
   settings: {
     'import/resolver': {
       'babel-module': {},
