@@ -2,17 +2,16 @@ import { provider as youdaoProvider } from './youdao';
 import { provider as bingProvider } from './bing';
 import { provider as googleProvider } from './google';
 import styles, { stylesheet } from './style.module.css';
+import { TranslatorProvider, TranslatorResponse } from './types';
 
-/** @type HTMLAudioElement */
-let audio;
-let mouse;
-let query;
-let hoverTimer;
+let audio: HTMLAudioElement;
+let mouse: { clientX: number; clientY: number };
+let query: string;
+let hoverTimer: NodeJS.Timeout;
 
 const panel = VM.getPanel({ shadow: false });
 const button = VM.getHostElement(false);
-/** @type HTMLElement */
-const buttonEl = button.root;
+const buttonEl = button.root as HTMLElement;
 buttonEl.className = styles.buttonRoot;
 buttonEl.append(
   <div
@@ -25,21 +24,16 @@ buttonEl.append(
 // Insert CSS after panel
 GM_addStyle(stylesheet);
 
-function play(url) {
-  if (!audio) audio = <audio autoPlay />;
+function play(url: string) {
+  audio ||= (<audio autoPlay />) as HTMLAudioElement;
   audio.src = url;
 }
 
-function getPlayer(url) {
-  return () => {
-    play(url);
-  };
-}
-
-function handleOpenUrl(e) {
-  const { href } = e.target.dataset;
-  /** @type HTMLAnchorElement */
-  const a = <a href={href} target="_blank" rel="noopener noreferrer" />;
+function handleOpenUrl(e: MouseEvent) {
+  const { href } = (e.target as HTMLAnchorElement).dataset;
+  const a = (
+    <a href={href} target="_blank" rel="noopener noreferrer" />
+  ) as HTMLAnchorElement;
   a.click();
 }
 
@@ -62,10 +56,7 @@ function handleCancel() {
   }
 }
 
-/**
- * @param { import('./types').TranslatorResponse[] } results
- */
-function render(results) {
+function render(results: TranslatorResponse) {
   panel.clear();
   for (const [name, result] of Object.entries(results)) {
     const { query: q, phonetic, detailUrl, explains, translations } = result;
@@ -80,7 +71,7 @@ function render(results) {
                 <panel.id
                   className={`${styles.phonetic} ${styles.link}`}
                   dangerouslySetInnerHTML={{ __html: html }}
-                  onClick={getPlayer(url)}
+                  onClick={() => play(url)}
                 />
               ))}
             </panel.id>
@@ -128,37 +119,37 @@ function render(results) {
 function getPosition() {
   const { innerWidth, innerHeight } = window;
   const { clientX, clientY } = mouse;
-  const style = {};
+  const style = {
+    top: 'auto',
+    left: 'auto',
+    right: 'auto',
+    bottom: 'auto',
+  };
   if (clientY > innerHeight * 0.5) {
-    style.top = 'auto';
     style.bottom = `${innerHeight - clientY + 10}px`;
   } else {
     style.top = `${clientY + 10}px`;
-    style.bottom = 'auto';
   }
   if (clientX > innerWidth * 0.5) {
-    style.left = 'auto';
     style.right = `${innerWidth - clientX}px`;
   } else {
     style.left = `${clientX}px`;
-    style.right = 'auto';
   }
   return style;
 }
 
-/**
- * @type import('./types').TranslatorProvider[]
- */
-const providers = [youdaoProvider, bingProvider, googleProvider];
+const providers: TranslatorProvider[] = [
+  youdaoProvider,
+  bingProvider,
+  googleProvider,
+];
 
 function getSelectionText() {
   const { activeElement } = document;
-  let text;
+  let text: string;
   if (['input', 'textarea'].includes(activeElement.tagName.toLowerCase())) {
-    text = activeElement.value.slice(
-      activeElement.selectionStart,
-      activeElement.selectionEnd
-    );
+    const inputEl = activeElement as HTMLInputElement;
+    text = inputEl.value.slice(inputEl.selectionStart, inputEl.selectionEnd);
   } else {
     const sel = window.getSelection();
     text = sel.toString();
@@ -166,12 +157,9 @@ function getSelectionText() {
   return text.trim();
 }
 
-let session;
+let session: TranslatorResponse;
 function translate() {
-  /**
-   * @type { [key: string]: import('./types').TranslatorResponse }
-   */
-  const results = {};
+  const results: TranslatorResponse = {};
   session = results;
   providers.forEach(async (provider) => {
     const result = await provider.handle(query);
@@ -181,13 +169,16 @@ function translate() {
   });
 }
 
-function debounce(func, delay) {
-  let timer;
-  function exec(...args) {
+function debounce<T extends unknown[]>(
+  func: (...args: T) => void,
+  delay: number
+): (...args: T) => void {
+  let timer: NodeJS.Timeout;
+  function exec(...args: T) {
     timer = null;
     func(...args);
   }
-  return (...args) => {
+  return (...args: T) => {
     if (timer) clearTimeout(timer);
     timer = setTimeout(exec, delay, ...args);
   };
@@ -195,7 +186,7 @@ function debounce(func, delay) {
 
 function initialize() {
   panel.body.classList.add(styles.panelBody);
-  const debouncedTranslate = debounce((event) => {
+  const debouncedTranslate = debounce((event: MouseEvent) => {
     mouse = {
       clientX: event.clientX,
       clientY: event.clientY,
@@ -204,11 +195,11 @@ function initialize() {
     if (/^\s*$/.test(query)) return;
     Object.assign(buttonEl.style, getPosition());
     button.show();
-  });
+  }, 0);
   document.addEventListener(
     'mousedown',
     (e) => {
-      if (panel.body.contains(e.target)) return;
+      if (panel.body.contains(e.target as HTMLElement)) return;
       panel.hide();
       button.hide();
       session = null;
@@ -218,7 +209,7 @@ function initialize() {
   document.addEventListener(
     'mouseup',
     (e) => {
-      if (panel.body.contains(e.target)) return;
+      if (panel.body.contains(e.target as HTMLElement)) return;
       debouncedTranslate(e);
     },
     true

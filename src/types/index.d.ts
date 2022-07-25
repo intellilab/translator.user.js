@@ -1,6 +1,6 @@
 import * as dom from '@violentmonkey/dom';
 import * as ui from '@violentmonkey/ui';
-import { VChildren, DomNode } from '@gera2ld/jsx-dom';
+import { DomNode } from '@gera2ld/jsx-dom';
 
 declare global {
   const VM: typeof dom & typeof ui;
@@ -8,11 +8,14 @@ declare global {
   namespace JSX {
     type Element = DomNode;
   }
+
+  const GM_xmlhttpRequest: (options: unknown) => void;
+  const GM_addStyle: (style: string) => void;
 }
 
 interface TranslatorResponse {
   query?: string;
-  phonetic?: Array<{ html: string; url: string; }>;
+  phonetic?: Array<{ html: string; url: string }>;
   explains?: string[];
   detailUrl?: string;
   translations?: string[];

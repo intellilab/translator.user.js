@@ -1,11 +1,12 @@
 module.exports = {
   extends: require.resolve('@gera2ld/plaid/config/babelrc-base'),
   presets: [
+    '@babel/preset-typescript',
   ],
   plugins: [
     ['@babel/plugin-transform-react-jsx', {
-      pragma: 'VM.hm',
+      pragma: 'VM.hm', // use 'VM.hm' if you don't need SVG support and don't want to call VM.m
       pragmaFrag: 'VM.Fragment',
     }],
-  ].filter(Boolean),
+  ],
 };

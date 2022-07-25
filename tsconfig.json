@@ -4,10 +4,10 @@
     "module": "es6",
     "moduleResolution": "node",
     "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "types",
     "allowSyntheticDefaultImports": true,
-    "jsx": "react",
-    "jsxFactory": "VM.h",
-    "jsxFragmentFactory": "VM.Fragment",
+    "jsx": "preserve",
     "lib": [
       "DOM",
       "ES6",

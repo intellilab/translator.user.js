@@ -1,9 +1,10 @@
+import { TranslatorProvider } from '../types';
 import { request } from '../util';
 
 const LANG_EN = 'en';
 const LANG_ZH_CN = 'zh-CN';
 
-async function translate(text, to) {
+async function translate(text: string, to: string) {
   const data = await request({
     url: 'https://translate.google.cn/translate_a/single',
     params: {
@@ -22,10 +23,7 @@ async function translate(text, to) {
   return { language, translations };
 }
 
-/**
- * @type import('../types').TranslatorProvider
- */
-export const provider = {
+export const provider: TranslatorProvider = {
   name: 'Google 翻译',
   handle: async (source) => {
     let data = await translate(source, LANG_ZH_CN);
