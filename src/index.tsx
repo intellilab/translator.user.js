@@ -10,6 +10,7 @@ let query: string;
 let hoverTimer: NodeJS.Timeout;
 
 const panel = VM.getPanel({ shadow: false });
+panel.setMovable(true);
 const button = VM.getHostElement(false);
 const buttonEl = button.root as HTMLElement;
 buttonEl.className = styles.buttonRoot;
@@ -63,7 +64,10 @@ function render(results: TranslatorResponse) {
     panel.append(
       <panel.id className={styles.section}>
         <panel.id className={styles.label}>{name}</panel.id>
-        <panel.id className={styles.content}>
+        <panel.id
+          className={styles.content}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
           {!!(q || phonetic?.length) && (
             <panel.id className={styles.block}>
               {q && <panel.id>{q}</panel.id>}
