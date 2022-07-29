@@ -57,7 +57,7 @@ function handleCancel() {
   }
 }
 
-function render(results: TranslatorResponse) {
+function render(results: Record<string, TranslatorResponse>) {
   panel.clear();
   for (const [name, result] of Object.entries(results)) {
     const { query: q, phonetic, detailUrl, explains, translations } = result;
@@ -66,7 +66,7 @@ function render(results: TranslatorResponse) {
         <panel.id className={styles.label}>{name}</panel.id>
         <panel.id
           className={styles.content}
-          onMouseDown={(e) => e.stopPropagation()}
+          onMouseDown={(e: MouseEvent) => e.stopPropagation()}
         >
           {!!(q || phonetic?.length) && (
             <panel.id className={styles.block}>
