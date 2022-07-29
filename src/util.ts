@@ -10,7 +10,7 @@ export function request<T>({
   url: string;
   params?: Record<string, string>;
   responseType?: 'text' | 'json';
-  data?: unknown;
+  data?: string | Blob | FormData;
   headers?: Record<string, string>;
 }) {
   return new Promise<T>((resolve, reject) => {
@@ -18,15 +18,15 @@ export function request<T>({
       const sep = url.includes('?') ? '&' : '?';
       url += sep + new URLSearchParams(params).toString();
     }
-    GM_xmlhttpRequest({
+    GM_xmlhttpRequest<T>({
       method,
       url,
       responseType,
       data,
       headers,
-      onload(res: XMLHttpRequest) {
+      onload(res) {
         if (res.status >= 300) return reject();
-        resolve(res.response as T);
+        resolve(res.response);
       },
       onerror: reject,
     });

@@ -8,9 +8,6 @@ declare global {
   namespace JSX {
     type Element = DomNode;
   }
-
-  const GM_xmlhttpRequest: (options: unknown) => void;
-  const GM_addStyle: (style: string) => void;
 }
 
 interface TranslatorResponse {
