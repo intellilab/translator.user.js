@@ -196,7 +196,7 @@ function initialize() {
       clientY: event.clientY,
     };
     query = getSelectionText();
-    if (/^\s*$/.test(query)) return;
+    if (!/\w/.test(query)) return;
     Object.assign(buttonEl.style, getPosition());
     button.show();
   }, 0);
