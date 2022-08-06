@@ -9,7 +9,10 @@ let mouse: { clientX: number; clientY: number };
 let query: string;
 let hoverTimer: NodeJS.Timeout;
 
-const panel = VM.getPanel({ shadow: false });
+const panel = VM.getPanel({
+  shadow: false,
+  style: stylesheet,
+});
 panel.setMovable(true);
 const button = VM.getHostElement(false);
 const buttonEl = button.root as HTMLElement;
@@ -21,9 +24,6 @@ buttonEl.append(
     onMouseOut={handleCancel}
   />
 );
-
-// Insert CSS after panel
-GM_addStyle(stylesheet);
 
 function play(url: string) {
   audio ||= (<audio autoPlay />) as HTMLAudioElement;
@@ -208,7 +208,7 @@ function initialize() {
       clientY: event.clientY,
     };
     query = getSelectionText();
-    if (!/\w/.test(query)) return;
+    if (!query || (!/\w/.test(query) && query.length < 3)) return;
     Object.assign(buttonEl.style, getPosition());
     button.show();
   }, 0);
