@@ -57,6 +57,18 @@ function handleCancel() {
   }
 }
 
+let policy: ReturnType<
+  typeof window.trustedTypes.createPolicy<{ createHTML: (p: string) => string }>
+>;
+
+function safeHTML(html: string) {
+  if (typeof window.trustedTypes === 'undefined') return html;
+  policy ||= window.trustedTypes.createPolicy('VMTrustedHTML', {
+    createHTML: (p) => p,
+  });
+  return policy.createHTML(html);
+}
+
 function render(results: Record<string, TranslatorResponse>) {
   panel.clear();
   for (const [name, result] of Object.entries(results)) {
@@ -74,7 +86,7 @@ function render(results: Record<string, TranslatorResponse>) {
               {phonetic?.map(({ html, url }) => (
                 <panel.id
                   className={`${styles.phonetic} ${styles.link}`}
-                  dangerouslySetInnerHTML={{ __html: html }}
+                  dangerouslySetInnerHTML={{ __html: safeHTML(html) }}
                   onClick={() => play(url)}
                 />
               ))}
@@ -85,7 +97,7 @@ function render(results: Record<string, TranslatorResponse>) {
               {explains.map((item) => (
                 <panel.id
                   className={styles.item}
-                  dangerouslySetInnerHTML={{ __html: item }}
+                  dangerouslySetInnerHTML={{ __html: safeHTML(item) }}
                 />
               ))}
             </panel.id>
@@ -106,7 +118,7 @@ function render(results: Record<string, TranslatorResponse>) {
               {translations.map((item) => (
                 <panel.id
                   className={styles.item}
-                  dangerouslySetInnerHTML={{ __html: item }}
+                  dangerouslySetInnerHTML={{ __html: safeHTML(item) }}
                 />
               ))}
             </panel.id>
@@ -161,9 +173,9 @@ function getSelectionText() {
   return text.trim();
 }
 
-let session: TranslatorResponse;
+let session: Record<string, unknown>;
 function translate() {
-  const results: TranslatorResponse = {};
+  const results: Record<string, TranslatorResponse> = {};
   session = results;
   providers.forEach(async (provider) => {
     const result = await provider.handle(query);
