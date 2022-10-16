@@ -6,7 +6,7 @@ const LANG_ZH_CN = 'zh-CN';
 
 async function translate(text: string, to: string) {
   const data = await request({
-    url: 'https://translate.google.cn/translate_a/single',
+    url: 'https://translate.google.com/translate_a/single',
     params: {
       q: text,
       client: 'gtx',

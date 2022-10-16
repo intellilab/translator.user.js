@@ -9,7 +9,7 @@ export function request<T>({
   method?: string;
   url: string;
   params?: Record<string, string>;
-  responseType?: 'text' | 'json';
+  responseType?: VMScriptResponseType;
   data?: string | Blob | FormData;
   headers?: Record<string, string>;
 }) {
