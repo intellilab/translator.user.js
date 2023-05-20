@@ -12,13 +12,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14'
-      - name: Install deps
-        run: yarn
+          node-version: '16'
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
       - name: Build
-        run: yarn build
+        run: pnpm i && pnpm build
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
