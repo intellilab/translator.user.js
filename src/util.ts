@@ -1,4 +1,4 @@
-export function request<T>({
+export function request<T = any>({
   method = 'GET',
   url,
   params,

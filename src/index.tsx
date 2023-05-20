@@ -1,3 +1,4 @@
+import { getHostElement, getPanel } from '@violentmonkey/ui';
 import { provider as youdaoProvider } from './youdao';
 import { provider as bingProvider } from './bing';
 import { provider as googleProvider } from './google';
@@ -9,12 +10,12 @@ let mouse: { clientX: number; clientY: number };
 let query: string;
 let hoverTimer: NodeJS.Timeout;
 
-const panel = VM.getPanel({
+const panel = getPanel({
   shadow: false,
   style: stylesheet,
 });
 panel.setMovable(true);
-const button = VM.getHostElement(false);
+const button = getHostElement(false);
 const buttonEl = button.root as HTMLElement;
 buttonEl.className = styles.buttonRoot;
 buttonEl.append(

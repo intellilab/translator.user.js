@@ -35,10 +35,15 @@ const rollupConfig = [
             .replace('process.env.AUTHOR', pkg.author),
         ),
       ],
+      external: [/^@violentmonkey\//],
     },
     output: {
       format: 'iife',
       file: `${DIST}/${FILENAME}.user.js`,
+      globals: {
+        '@violentmonkey/dom': 'VM',
+        '@violentmonkey/ui': 'VM',
+      },
       ...bundleOptions,
     },
   },

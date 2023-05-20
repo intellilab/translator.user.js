@@ -4,7 +4,6 @@
   padding: 0;
   overflow: auto;
   overscroll-behavior: contain;
-  box-shadow: 0 0 10px #222;
 }
 
 .link {

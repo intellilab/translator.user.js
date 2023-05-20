@@ -15,7 +15,7 @@ export const provider = {
       key: null,
       translate: 'on',
       q: text,
-      ts: Date.now(),
+      ts: `${Date.now()}`,
     };
     const result = await request({
       url: 'https://fanyi.youdao.com/openapi.do',
