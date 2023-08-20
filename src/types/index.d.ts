@@ -1,4 +1,5 @@
 import { DomNode } from '@gera2ld/jsx-dom';
+import '@violentmonkey/types';
 
 declare global {
   namespace JSX {

@@ -10,7 +10,7 @@ async function getAuthPromise() {
     responseType: 'text',
   });
   const matches = text.match(
-    /var params_RichTranslateHelper = \[(\d+),"([^"]+)"/
+    /var params_RichTranslateHelper = \[(\d+),"([^"]+)"/,
   );
   setTimeout(() => {
     authPromise = undefined;

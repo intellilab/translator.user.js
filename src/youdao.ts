@@ -33,19 +33,19 @@ export const provider = {
           {
             html: `UK: [${uk || noPhonetic}]`,
             url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(
-              query
+              query,
             )}&type=1`,
           },
           {
             html: `US: [${us || noPhonetic}]`,
             url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(
-              query
+              query,
             )}&type=2`,
           },
         ],
         explains,
         detailUrl: `http://dict.youdao.com/search?q=${encodeURIComponent(
-          query
+          query,
         )}`,
       };
     }

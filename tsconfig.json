@@ -15,7 +15,6 @@
     ]
   },
   "include": [
-    "src/**/*",
-    "node_modules/@violentmonkey/types"
+    "src/**/*"
   ]
 }

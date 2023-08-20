@@ -1,3 +1,4 @@
+import './meta.js?userscript-metadata';
 import { getHostElement, getPanel } from '@violentmonkey/ui';
 import { provider as youdaoProvider } from './youdao';
 import { provider as bingProvider } from './bing';
@@ -8,7 +9,7 @@ import { TranslatorProvider, TranslatorResponse } from './types';
 let audio: HTMLAudioElement;
 let mouse: { clientX: number; clientY: number };
 let query: string;
-let hoverTimer: NodeJS.Timeout;
+let hoverTimer: number;
 
 const panel = getPanel({
   shadow: false,
@@ -23,7 +24,7 @@ buttonEl.append(
     className={styles.button}
     onMouseOver={handlePrepare}
     onMouseOut={handleCancel}
-  />
+  />,
 );
 
 function play(url: string) {
@@ -125,7 +126,7 @@ function render(results: Record<string, TranslatorResponse>) {
             </panel.id>
           )}
         </panel.id>
-      </panel.id>
+      </panel.id>,
     );
   }
   const { wrapper } = panel;
@@ -188,9 +189,9 @@ function translate() {
 
 function debounce<T extends unknown[]>(
   func: (...args: T) => void,
-  delay: number
+  delay: number,
 ): (...args: T) => void {
-  let timer: NodeJS.Timeout;
+  let timer: number;
   function exec(...args: T) {
     timer = null;
     func(...args);
@@ -221,7 +222,7 @@ function initialize() {
       button.hide();
       session = null;
     },
-    true
+    true,
   );
   document.addEventListener(
     'mouseup',
@@ -229,7 +230,7 @@ function initialize() {
       if (panel.body.contains(e.target as HTMLElement)) return;
       debouncedTranslate(e);
     },
-    true
+    true,
   );
 }
 

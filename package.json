@@ -10,27 +10,26 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "dev": "rollup -wc rollup.conf.js",
-    "build:js": "cross-env NODE_ENV=production rollup -c rollup.conf.js",
+    "dev": "rollup -wc",
+    "build:js": "NODE_ENV=production rollup -c",
     "build": "run-s lint clean build:js",
     "lint": "eslint --ext .ts,.tsx .",
     "clean": "del-cli dist",
     "prepublishOnly": "run-s build"
   },
   "devDependencies": {
-    "@babel/plugin-transform-react-jsx": "^7.21.5",
-    "@gera2ld/plaid": "~2.5.6",
-    "@gera2ld/plaid-common-ts": "~2.5.1",
-    "@gera2ld/plaid-rollup": "~2.5.6",
-    "@types/trusted-types": "^2.0.3",
-    "@violentmonkey/types": "^0.1.5",
-    "del-cli": "^5.0.0",
-    "husky": "^8.0.3",
-    "rollup-plugin-userscript": "^0.1.1"
+    "@babel/plugin-transform-react-jsx": "^7.23.4",
+    "@gera2ld/plaid": "~2.7.0",
+    "@gera2ld/plaid-rollup": "~2.7.0",
+    "@types/trusted-types": "^2.0.7",
+    "@violentmonkey/types": "^0.1.7",
+    "del-cli": "^5.1.0",
+    "husky": "^9.0.11",
+    "rollup-plugin-userscript": "^0.3.2"
   },
   "dependencies": {
-    "@babel/runtime": "^7.21.5",
-    "@violentmonkey/dom": "^2.1.4",
+    "@babel/runtime": "^7.24.0",
+    "@violentmonkey/dom": "^2.1.5",
     "@violentmonkey/ui": "^0.7.8"
   }
 }
